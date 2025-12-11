@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { Home, BarChart, Calculator, HeartPulse } from 'lucide-react';
+import { Home, BarChart, Calculator, HeartPulse, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   Sidebar,
@@ -21,6 +21,7 @@ const links = [
   { href: '/food-doctor', label: 'ফুড ডক্টর', icon: HeartPulse },
   { href: '/calorie-tracker', label: 'ক্যালোরি ট্র্যাকার', icon: Calculator },
   { href: '/analytics', label: 'বিশ্লেষণ', icon: BarChart },
+  { href: '/settings', label: 'সেটিংস', icon: Settings },
 ];
 
 function MobileNav() {
