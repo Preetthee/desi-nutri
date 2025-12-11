@@ -149,7 +149,7 @@ export default function FoodDoctorPage() {
               </CardHeader>
               <CardContent>
                 <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                  {suggestions.recommended_foods.map((food, i) => <li key={i}>{food}</li>)}
+                  {suggestions.recommended_foods?.map((food, i) => <li key={i}>{food}</li>)}
                 </ul>
               </CardContent>
             </Card>
@@ -162,7 +162,7 @@ export default function FoodDoctorPage() {
               </CardHeader>
               <CardContent>
                 <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                  {suggestions.budget_friendly_foods.map((food, i) => <li key={i}>{food}</li>)}
+                  {suggestions.budget_friendly_foods?.map((food, i) => <li key={i}>{food}</li>)}
                 </ul>
               </CardContent>
             </Card>
@@ -175,7 +175,7 @@ export default function FoodDoctorPage() {
               </CardHeader>
               <CardContent>
                 <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                  {suggestions.foods_to_avoid.map((food, i) => <li key={i}>{food}</li>)}
+                  {suggestions.foods_to_avoid?.map((food, i) => <li key={i}>{food}</li>)}
                 </ul>
               </CardContent>
             </Card>
