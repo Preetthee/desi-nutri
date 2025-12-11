@@ -93,8 +93,8 @@ export default function CalorieTrackerPage() {
                   {isPending ? 'Estimating Calories...' : 'Estimate Calories'}
                 </Button>
               </form>
-            </CardContent>
-          </Card>
+            </Form>
+          </CardContent>
         </Card>
 
         <Card>
