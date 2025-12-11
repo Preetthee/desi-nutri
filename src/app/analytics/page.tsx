@@ -24,12 +24,13 @@ import {
   eachWeekOfInterval,
   eachMonthOfInterval,
 } from 'date-fns';
+import { bn } from 'date-fns/locale';
 
 type TimeRange = 'day' | 'week' | 'month';
 
 const chartConfig = {
   calories: {
-    label: 'Calories',
+    label: 'ক্যালোরি',
     color: 'hsl(var(--primary))',
   },
 } satisfies ChartConfig;
@@ -53,7 +54,7 @@ export default function AnalyticsPage() {
           const total = logs
             .filter((log) => startOfDay(new Date(log.date)).getTime() === dayStart.getTime())
             .reduce((sum, log) => sum + log.total_calories, 0);
-          return { date: format(day, 'MMM d'), calories: total };
+          return { date: format(day, 'MMM d', { locale: bn }), calories: total };
         });
         return dailyLogs;
       }
@@ -68,7 +69,7 @@ export default function AnalyticsPage() {
               return logDate >= weekStart && logDate <= weekEnd;
             })
             .reduce((sum, log) => sum + log.total_calories, 0);
-          return { date: format(weekStart, 'MMM d'), calories: total };
+          return { date: format(weekStart, 'MMM d', { locale: bn }), calories: total };
         });
         return weeklyLogs;
       }
@@ -79,7 +80,7 @@ export default function AnalyticsPage() {
           const total = logs
             .filter((log) => startOfMonth(new Date(log.date)).getTime() === monthStart.getTime())
             .reduce((sum, log) => sum + log.total_calories, 0);
-          return { date: format(monthStart, 'MMM yyyy'), calories: total };
+          return { date: format(monthStart, 'MMM yyyy', { locale: bn }), calories: total };
         });
         return monthlyLogs;
       }
@@ -106,19 +107,19 @@ export default function AnalyticsPage() {
     <main className="flex-1 p-4 md:p-8">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold font-headline tracking-tight">Analytics</h1>
-          <p className="text-muted-foreground">Your calorie intake at a glance.</p>
+          <h1 className="text-3xl font-bold font-headline tracking-tight">বিশ্লেষণ</h1>
+          <p className="text-muted-foreground">আপনার ক্যালোরি গ্রহণের একটি সংক্ষিপ্ত চিত্র।</p>
         </div>
       </div>
       <Card>
         <CardHeader>
-          <CardTitle>Calorie Intake</CardTitle>
+          <CardTitle>ক্যালোরি গ্রহণ</CardTitle>
            <CardDescription>
             {
               {
-                day: `Total today: ${totalCaloriesThisPeriod.toLocaleString()} calories`,
-                week: `Total this week: ${totalCaloriesThisPeriod.toLocaleString()} calories`,
-                month: `Total this month: ${totalCaloriesThisPeriod.toLocaleString()} calories`,
+                day: `আজ মোট: ${totalCaloriesThisPeriod.toLocaleString('bn-BD')} ক্যালোরি`,
+                week: `এই সপ্তাহে মোট: ${totalCaloriesThisPeriod.toLocaleString('bn-BD')} ক্যালোরি`,
+                month: `এই মাসে মোট: ${totalCaloriesThisPeriod.toLocaleString('bn-BD')} ক্যালোরি`,
               }[timeRange]
             }
           </CardDescription>
@@ -126,9 +127,9 @@ export default function AnalyticsPage() {
         <CardContent>
           <Tabs value={timeRange} onValueChange={(value) => setTimeRange(value as TimeRange)}>
             <TabsList className="mb-4">
-              <TabsTrigger value="day">Last 7 Days</TabsTrigger>
-              <TabsTrigger value="week">Last 8 Weeks</TabsTrigger>
-              <TabsTrigger value="month">Last 12 Months</TabsTrigger>
+              <TabsTrigger value="day">গত ৭ দিন</TabsTrigger>
+              <TabsTrigger value="week">গত ৮ সপ্তাহ</TabsTrigger>
+              <TabsTrigger value="month">গত ১২ মাস</TabsTrigger>
             </TabsList>
             <TabsContent value={timeRange} className="h-[400px]">
               <ChartContainer config={chartConfig} className="h-full w-full">
@@ -145,10 +146,11 @@ export default function AnalyticsPage() {
                     tickLine={false}
                     tickMargin={10}
                     axisLine={false}
+                    tickFormatter={(value) => value.toLocaleString('bn-BD')}
                   />
                   <ChartTooltip
                     cursor={false}
-                    content={<ChartTooltipContent indicator="dot" />}
+                    content={<ChartTooltipContent indicator="dot" formatter={(value, name, props) => [`${(value as number).toLocaleString('bn-BD')}`, chartConfig.calories.label ]} />}
                   />
                   <Bar dataKey="calories" fill="var(--color-calories)" radius={4} />
                 </BarChart>

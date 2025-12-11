@@ -30,8 +30,8 @@ export default function FoodDoctorPage() {
   const handleGenerate = () => {
     if (!profile) {
       toast({
-        title: 'Error',
-        description: 'User profile not found. Please complete onboarding.',
+        title: 'ত্রুটি',
+        description: 'ব্যবহারকারীর প্রোফাইল পাওয়া যায়নি। অনুগ্রহ করে অনবোর্ডিং সম্পূর্ণ করুন।',
         variant: 'destructive',
       });
       return;
@@ -44,8 +44,8 @@ export default function FoodDoctorPage() {
       } catch (error) {
         console.error(error);
         toast({
-          title: 'AI Error',
-          description: 'Failed to generate food suggestions. Please try again.',
+          title: 'AI ত্রুটি',
+          description: 'খাদ্য পরামর্শ তৈরি করতে ব্যর্থ। অনুগ্রহ করে আবার চেষ্টা করুন।',
           variant: 'destructive',
         });
       }
@@ -89,12 +89,12 @@ export default function FoodDoctorPage() {
     <main className="flex-1 p-4 md:p-8">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold font-headline tracking-tight">Food Doctor</h1>
-          <p className="text-muted-foreground">Your personal AI-powered nutrition guide.</p>
+          <h1 className="text-3xl font-bold font-headline tracking-tight">ফুড ডক্টর</h1>
+          <p className="text-muted-foreground">আপনার ব্যক্তিগত AI-চালিত পুষ্টি নির্দেশিকা।</p>
         </div>
         <Button onClick={() => { setSuggestions(null); handleGenerate(); }} disabled={isPending}>
           <RefreshCw className={`mr-2 h-4 w-4 ${isPending ? 'animate-spin' : ''}`} />
-          Regenerate
+          পুনরায় তৈরি করুন
         </Button>
       </div>
 
@@ -106,25 +106,25 @@ export default function FoodDoctorPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Utensils className="text-primary" />
-                Daily Meal Plan
+                দৈনিক আহার পরিকল্পনা
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="space-y-1">
-                  <h3 className="font-semibold">Breakfast</h3>
+                  <h3 className="font-semibold">সকালের নাস্তা</h3>
                   <p className="text-muted-foreground">{suggestions.daily_meal_plan.breakfast}</p>
                 </div>
                 <div className="space-y-1">
-                  <h3 className="font-semibold">Lunch</h3>
+                  <h3 className="font-semibold">দুপুরের খাবার</h3>
                   <p className="text-muted-foreground">{suggestions.daily_meal_plan.lunch}</p>
                 </div>
                 <div className="space-y-1">
-                  <h3 className="font-semibold">Dinner</h3>
+                  <h3 className="font-semibold">রাতের খাবার</h3>
                   <p className="text-muted-foreground">{suggestions.daily_meal_plan.dinner}</p>
                 </div>
                 <div className="space-y-1">
-                  <h3 className="font-semibold">Snacks</h3>
+                  <h3 className="font-semibold">হালকা খাবার</h3>
                   <p className="text-muted-foreground">{suggestions.daily_meal_plan.snacks}</p>
                 </div>
               </div>
@@ -136,7 +136,7 @@ export default function FoodDoctorPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-green-600">
                   <Leaf />
-                  Recommended Foods
+                  প্রস্তাবিত খাবার
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -149,7 +149,7 @@ export default function FoodDoctorPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-red-600">
                   <Siren />
-                  Foods to Avoid
+                  যেসব খাবার এড়িয়ে চলতে হবে
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -163,7 +163,7 @@ export default function FoodDoctorPage() {
       ) : (
         isClient && (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">Click "Regenerate" to get your personalized food plan.</p>
+            <p className="text-muted-foreground">আপনার ব্যক্তিগতকৃত খাদ্য পরিকল্পনা পেতে "পুনরায় তৈরি করুন" ক্লিক করুন।</p>
           </div>
         )
       )}

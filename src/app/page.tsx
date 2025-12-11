@@ -37,10 +37,9 @@ export default function Home() {
           setHealthTip(tip);
         } catch (error) {
           console.error("Failed to fetch health tip:", error);
-          // Set a default tip on error
           setHealthTip({
-            suggestion: "Stay hydrated by drinking plenty of water.",
-            explanation: "Good hydration is essential for overall health and can also aid in weight management."
+            suggestion: "প্রচুর পানি পান করে হাইড্রেটেড থাকুন।",
+            explanation: "ಉತ್ತಮ ಜಲಸಂಚಯನವು ஒட்டுமொத்த ಆರೋಗ್ಯಕ್ಕೆ ಅವಶ್ಯಕವಾಗಿದೆ ಮತ್ತು ತೂಕ ನಿರ್ವಹണೆಗೆ ಸಹಾಯ ಮಾಡುತ್ತದೆ."
           });
         } finally {
           setIsLoadingTip(false);
@@ -68,7 +67,7 @@ export default function Home() {
     if (yesterdayCalories > 0) {
       trendPercentage = ((todayCalories - yesterdayCalories) / yesterdayCalories) * 100;
     } else if (todayCalories > 0) {
-      trendPercentage = 100; // If yesterday was 0 and today is not, it's a 100% increase
+      trendPercentage = 100;
     }
 
     return { todayCalories, trendPercentage };
@@ -90,27 +89,27 @@ export default function Home() {
       <main className="flex-1 p-4 md:p-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold font-headline tracking-tight">
-            Welcome back, {profile.name}!
+            আবারও স্বাগতম, {profile.name}!
           </h1>
           <p className="text-muted-foreground">
-            Here's your daily health snapshot.
+            এখানে আপনার দৈনিক স্বাস্থ্যের স্ন্যাপশট।
           </p>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
           <Card>
             <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Today's Calorie Intake</CardTitle>
+              <CardTitle className="text-sm font-medium">আজকের ক্যালোরি গ্রহণ</CardTitle>
               <HeartPulse className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{todayCalories.toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground">Total calories consumed today</p>
+              <div className="text-2xl font-bold">{todayCalories.toLocaleString('bn-BD')}</div>
+              <p className="text-xs text-muted-foreground">আজ মোট ক্যালোরি গ্রহণ করা হয়েছে</p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Daily Trend</CardTitle>
+              <CardTitle className="text-sm font-medium">দৈনিক প্রবণতা</CardTitle>
               <TrendIcon className={`h-4 w-4 ${trendColor}`} />
             </CardHeader>
             <CardContent>
@@ -118,7 +117,7 @@ export default function Home() {
                 {trendPercentage !== 0 && (trendPercentage > 0 ? '+' : '')}
                 {trendPercentage.toFixed(1)}%
               </div>
-              <p className="text-xs text-muted-foreground">Compared to yesterday</p>
+              <p className="text-xs text-muted-foreground">গতকালের তুলনায়</p>
             </CardContent>
           </Card>
         </div>
@@ -127,7 +126,7 @@ export default function Home() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Lightbulb className="text-primary" />
-              Your Daily Health Tip
+              আপনার দৈনিক স্বাস্থ্য টিপ
             </CardTitle>
           </CardHeader>
           <CardContent>

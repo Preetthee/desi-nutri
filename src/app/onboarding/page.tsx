@@ -23,12 +23,12 @@ import { Logo } from '@/components/logo';
 
 const formSchema = z.object({
   name: z.string().min(2, {
-    message: 'Name must be at least 2 characters.',
+    message: 'নাম কমপক্ষে ২ অক্ষরের হতে হবে।',
   }),
-  age: z.coerce.number().min(1, 'Age is required.'),
-  height: z.coerce.number().min(1, 'Height is required in cm.'),
-  weight: z.coerce.number().min(1, 'Weight is required in kg.'),
-  health_info: z.string().min(10, 'Please provide some health details.'),
+  age: z.coerce.number().min(1, 'বয়স आवश्यक।'),
+  height: z.coerce.number().min(1, 'উচ্চতা (সেমি) आवश्यक।'),
+  weight: z.coerce.number().min(1, 'ওজন (কেজি) आवश्यक।'),
+  health_info: z.string().min(10, 'অনুগ্রহ করে কিছু স্বাস্থ্য সম্পর্কিত তথ্য দিন।'),
 });
 
 export default function OnboardingPage() {
@@ -56,8 +56,8 @@ export default function OnboardingPage() {
       <Card className="w-full max-w-lg">
         <CardHeader className="items-center text-center">
             <Logo className="mb-2"/>
-          <CardTitle className="text-2xl font-headline">Welcome to Nutrition Navigator</CardTitle>
-          <CardDescription>Let's get to know you to personalize your experience.</CardDescription>
+          <CardTitle className="text-2xl font-headline">পুষ্টি நேভিগেটরে স্বাগতম</CardTitle>
+          <CardDescription>আপনার অভিজ্ঞতা ব্যক্তিগতকৃত করতে আসুন আমরা আপনাকে জানি।</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -67,9 +67,9 @@ export default function OnboardingPage() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Name</FormLabel>
+                    <FormLabel>নাম</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g. Jane Doe" {...field} />
+                      <Input placeholder="उदा: जेन डो" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -81,9 +81,9 @@ export default function OnboardingPage() {
                   name="age"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Age</FormLabel>
+                      <FormLabel>বয়স</FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="e.g. 30" {...field} />
+                        <Input type="number" placeholder="उदा: ৩০" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -94,9 +94,9 @@ export default function OnboardingPage() {
                   name="height"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Height (cm)</FormLabel>
+                      <FormLabel>উচ্চতা (সেমি)</FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="e.g. 170" {...field} />
+                        <Input type="number" placeholder="उदा: ১৭০" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -107,9 +107,9 @@ export default function OnboardingPage() {
                   name="weight"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Weight (kg)</FormLabel>
+                      <FormLabel>ওজন (কেজি)</FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="e.g. 65" {...field} />
+                        <Input type="number" placeholder="उदा: ৬৫" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -121,21 +121,21 @@ export default function OnboardingPage() {
                 name="health_info"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Health Goals & Information</FormLabel>
+                    <FormLabel>স্বাস্থ্য সম্পর্কিত তথ্য ও লক্ষ্য</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="e.g. Looking to lose weight, have a gluten allergy, vegetarian."
+                        placeholder="उदा: ওজন কমাতে চাই, গ্লুটেন অ্যালার্জি আছে, নিরামিষাশী।"
                         {...field}
                       />
                     </FormControl>
                     <FormDescription>
-                      This helps us create better recommendations for you.
+                      এটি আপনাকে আরও ভালো সুপারিশ তৈরি করতে সাহায্য করে।
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full">Get Started</Button>
+              <Button type="submit" className="w-full">শুরু করুন</Button>
             </form>
           </Form>
         </CardContent>

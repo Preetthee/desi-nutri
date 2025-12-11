@@ -8,6 +8,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
+import { bn } from 'date-fns/locale';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -18,7 +19,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@/component
 import { Bot } from 'lucide-react';
 
 const formSchema = z.object({
-  foodText: z.string().min(3, 'Please enter what you ate.'),
+  foodText: z.string().min(3, 'অনুগ্রহ করে আপনি কী খেয়েছেন তা লিখুন।'),
 });
 
 export default function CalorieTrackerPage() {
@@ -47,8 +48,8 @@ export default function CalorieTrackerPage() {
       } catch (error) {
         console.error(error);
         toast({
-          title: 'AI Error',
-          description: 'Failed to estimate calories. Please try again.',
+          title: 'AI ত্রুটি',
+          description: 'ক্যালোরি অনুমান করতে ব্যর্থ। অনুগ্রহ করে আবার চেষ্টা করুন।',
           variant: 'destructive',
         });
       }
@@ -61,16 +62,16 @@ export default function CalorieTrackerPage() {
     <main className="flex-1 p-4 md:p-8">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold font-headline tracking-tight">Calorie Tracker</h1>
-          <p className="text-muted-foreground">Log your meals and let AI do the counting.</p>
+          <h1 className="text-3xl font-bold font-headline tracking-tight">ক্যালোরি ট্র্যাকার</h1>
+          <p className="text-muted-foreground">আপনার খাবার লগ করুন এবং AI কে গণনা করতে দিন।</p>
         </div>
       </div>
       <div className="grid gap-8 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Log a New Meal</CardTitle>
+            <CardTitle>নতুন খাবার লগ করুন</CardTitle>
             <CardDescription>
-              Describe what you ate, e.g., "A bowl of oatmeal with blueberries and a coffee".
+              আপনি কী খেয়েছেন তা বর্ণনা করুন, যেমন, "এক বাটি ওটমিল সাথে ব্লুবেরি এবং একটি কফি"।
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -82,7 +83,7 @@ export default function CalorieTrackerPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Textarea placeholder="e.g., 2 slices of whole wheat toast with avocado and a fried egg" {...field} />
+                        <Textarea placeholder="उदा: ২ টি আটার রুটি সাথে অ্যাভোকাডো এবং একটি ভাজা ডিম" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -90,7 +91,7 @@ export default function CalorieTrackerPage() {
                 />
                 <Button type="submit" disabled={isPending} className="w-full">
                   <Bot className={`mr-2 h-4 w-4 ${isPending ? 'animate-pulse' : ''}`} />
-                  {isPending ? 'Estimating Calories...' : 'Estimate Calories'}
+                  {isPending ? 'ক্যালোরি অনুমান করা হচ্ছে...' : 'ক্যালোরি অনুমান করুন'}
                 </Button>
               </form>
             </Form>
@@ -99,25 +100,25 @@ export default function CalorieTrackerPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Recent Logs</CardTitle>
-            <CardDescription>Your last few logged meals.</CardDescription>
+            <CardTitle>সাম্প্রতিক লগ</CardTitle>
+            <CardDescription>আপনার শেষ কয়েকটি লগ করা খাবার।</CardDescription>
           </CardHeader>
           <CardContent>
             <Table>
-               {logs.length === 0 && <TableCaption>No meals logged yet.</TableCaption>}
+               {logs.length === 0 && <TableCaption>এখনও কোনো খাবার লগ করা হয়নি।</TableCaption>}
               <TableHeader>
                 <TableRow>
-                  <TableHead>Meal</TableHead>
-                  <TableHead className="text-right">Calories</TableHead>
-                  <TableHead className="text-right">Date</TableHead>
+                  <TableHead>খাবার</TableHead>
+                  <TableHead className="text-right">ক্যালোরি</TableHead>
+                  <TableHead className="text-right">তারিখ</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {sortedLogs.slice(0, 5).map((log) => (
                   <TableRow key={log.id}>
                     <TableCell className="font-medium max-w-xs truncate">{log.food_text}</TableCell>
-                    <TableCell className="text-right font-semibold">{log.total_calories}</TableCell>
-                    <TableCell className="text-right text-muted-foreground">{format(new Date(log.date), 'MMM d, h:mm a')}</TableCell>
+                    <TableCell className="text-right font-semibold">{log.total_calories.toLocaleString('bn-BD')}</TableCell>
+                    <TableCell className="text-right text-muted-foreground">{format(new Date(log.date), 'MMM d, h:mm a', { locale: bn })}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

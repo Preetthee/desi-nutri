@@ -20,14 +20,14 @@ const FoodSuggestionsInputSchema = z.object({
 export type FoodSuggestionsInput = z.infer<typeof FoodSuggestionsInputSchema>;
 
 const FoodSuggestionsOutputSchema = z.object({
-  recommended_foods: z.array(z.string()).describe('A list of recommended foods for the user.'),
-  foods_to_avoid: z.array(z.string()).describe('A list of foods the user should avoid.'),
+  recommended_foods: z.array(z.string()).describe('A list of recommended foods for the user, in Bengali.'),
+  foods_to_avoid: z.array(z.string()).describe('A list of foods the user should avoid, in Bengali.'),
   daily_meal_plan: z.object({
-    breakfast: z.string().describe('Suggested breakfast for the user.'),
-    lunch: z.string().describe('Suggested lunch for the user.'),
-    dinner: z.string().describe('Suggested dinner for the user.'),
-    snacks: z.string().describe('Suggested snacks for the user.'),
-  }).describe('A full one-day meal plan for the user.'),
+    breakfast: z.string().describe('Suggested breakfast for the user, in Bengali.'),
+    lunch: z.string().describe('Suggested lunch for the user, in Bengali.'),
+    dinner: z.string().describe('Suggested dinner for the user, in Bengali.'),
+    snacks: z.string().describe('Suggested snacks for the user, in Bengali.'),
+  }).describe('A full one-day meal plan for the user, in Bengali.'),
 });
 export type FoodSuggestionsOutput = z.infer<typeof FoodSuggestionsOutputSchema>;
 
@@ -40,6 +40,7 @@ const foodSuggestionsPrompt = ai.definePrompt({
   input: {schema: FoodSuggestionsInputSchema},
   output: {schema: FoodSuggestionsOutputSchema},
   prompt: `You are a food and nutrition expert. Based on user info below, suggest a food guide.
+The entire response must be in Bengali.
 User info: Name={{name}}, Age={{age}}, Height={{height}}, Weight={{weight}}, Health={{health_info}}
 Return JSON:
 {

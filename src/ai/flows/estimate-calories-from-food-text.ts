@@ -18,7 +18,7 @@ export type EstimateCaloriesInput = z.infer<typeof EstimateCaloriesInputSchema>;
 const EstimateCaloriesOutputSchema = z.object({
   items: z.array(
     z.object({
-      name: z.string().describe('The name of the food item.'),
+      name: z.string().describe('The name of the food item, in Bengali.'),
       calories: z.number().describe('The estimated calories for the food item.'),
     })
   ).describe('The items in the food text and their calorie estimations'),
@@ -34,7 +34,7 @@ const prompt = ai.definePrompt({
   name: 'estimateCaloriesPrompt',
   input: {schema: EstimateCaloriesInputSchema},
   output: {schema: EstimateCaloriesOutputSchema},
-  prompt: `User input:\"{{food}}\"\nReturn JSON:\n{\"items\":[{\"name\":\"\",\"calories\":number}],\"total_calories\":number}`,
+  prompt: `User input:\"{{food}}\"\nReturn JSON where names are in Bengali:\n{\"items\":[{\"name\":\"\",\"calories\":number}],\"total_calories\":number}`,
 });
 
 const estimateCaloriesFlow = ai.defineFlow(

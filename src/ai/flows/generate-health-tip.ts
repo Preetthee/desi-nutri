@@ -17,8 +17,8 @@ const GenerateHealthTipInputSchema = z.object({
 export type GenerateHealthTipInput = z.infer<typeof GenerateHealthTipInputSchema>;
 
 const GenerateHealthTipOutputSchema = z.object({
-  suggestion: z.string().describe('A short, actionable health suggestion or reminder for the user.'),
-  explanation: z.string().describe('A brief explanation of how the suggestion will help the user achieve their health goals.'),
+  suggestion: z.string().describe('A short, actionable health suggestion or reminder for the user, in Bengali.'),
+  explanation: z.string().describe('A brief explanation of how the suggestion will help the user achieve their health goals, in Bengali.'),
 });
 export type GenerateHealthTipOutput = z.infer<typeof GenerateHealthTipOutputSchema>;
 
@@ -33,11 +33,13 @@ const prompt = ai.definePrompt({
   prompt: `You are a friendly and encouraging health coach. Based on the user's health goals, provide a concise, actionable suggestion and a brief explanation of its benefits.
 The user's name is {{name}} and their goals are: "{{health_info}}".
 
+The entire response must be in Bengali.
+
 Keep the suggestion to a single, impactful sentence. The explanation should also be a single sentence.
 Example Output for a user wanting to "lose weight":
 {
-  "suggestion": "Try to incorporate a 15-minute walk into your lunch break today.",
-  "explanation": "This can help boost your metabolism and contribute to your daily calorie deficit."
+  "suggestion": "আজ আপনার লাঞ্চ ব্রেকে ১৫ মিনিটের হাঁটার চেষ্টা করুন।",
+  "explanation": "এটি আপনার মেটাবলিজম বাড়াতে এবং আপনার দৈনিক ক্যালোরি ঘাটতিতে অবদান রাখতে পারে।"
 }
 `,
 });

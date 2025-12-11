@@ -17,10 +17,10 @@ import { Logo } from './logo';
 import { useSidebar } from '@/components/ui/sidebar';
 
 const links = [
-  { href: '/', label: 'Home', icon: Home },
-  { href: '/food-doctor', label: 'Food Doctor', icon: HeartPulse },
-  { href: '/calorie-tracker', label: 'Calorie Tracker', icon: Calculator },
-  { href: '/analytics', label: 'Analytics', icon: BarChart },
+  { href: '/', label: 'হোম', icon: Home },
+  { href: '/food-doctor', label: 'ফুড ডক্টর', icon: HeartPulse },
+  { href: '/calorie-tracker', label: 'ক্যালোরি ট্র্যাকার', icon: Calculator },
+  { href: '/analytics', label: 'বিশ্লেষণ', icon: BarChart },
 ];
 
 function MobileNav() {
