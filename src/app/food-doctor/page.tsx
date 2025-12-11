@@ -7,7 +7,7 @@ import type { FoodSuggestions, UserProfile } from '@/lib/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { RefreshCw, Leaf, Siren, Utensils, VenetianMask } from 'lucide-react';
+import { RefreshCw, Leaf, Siren, Utensils, Wallet } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function FoodDoctorPage() {
@@ -64,13 +64,21 @@ export default function FoodDoctorPage() {
           <Skeleton className="h-4 w-full" />
         </CardContent>
       </Card>
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid md:grid-cols-3 gap-6">
         <Card>
           <CardHeader>
             <Skeleton className="h-6 w-1/2" />
           </CardHeader>
           <CardContent className="space-y-2">
              {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-4 w-full" />)}
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-6 w-1/2" />
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-4 w-full" />)}
           </CardContent>
         </Card>
         <Card>
@@ -131,7 +139,7 @@ export default function FoodDoctorPage() {
             </CardContent>
           </Card>
 
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-3 gap-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-green-600">
@@ -142,6 +150,19 @@ export default function FoodDoctorPage() {
               <CardContent>
                 <ul className="list-disc list-inside space-y-1 text-muted-foreground">
                   {suggestions.recommended_foods.map((food, i) => <li key={i}>{food}</li>)}
+                </ul>
+              </CardContent>
+            </Card>
+            <Card>
+               <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-blue-600">
+                  <Wallet />
+                  বাজেট-বান্ধব খাবার
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                  {suggestions.budget_friendly_foods.map((food, i) => <li key={i}>{food}</li>)}
                 </ul>
               </CardContent>
             </Card>

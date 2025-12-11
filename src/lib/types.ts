@@ -8,6 +8,7 @@ export type UserProfile = {
 
 export type FoodSuggestions = {
   recommended_foods: string[];
+  budget_friendly_foods: string[];
   foods_to_avoid: string[];
   daily_meal_plan: {
     breakfast: string;

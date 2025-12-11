@@ -21,6 +21,7 @@ export type FoodSuggestionsInput = z.infer<typeof FoodSuggestionsInputSchema>;
 
 const FoodSuggestionsOutputSchema = z.object({
   recommended_foods: z.array(z.string()).describe('A list of recommended foods for the user, in Bengali.'),
+  budget_friendly_foods: z.array(z.string()).describe('A list of budget-friendly recommended foods for the user, in Bengali.'),
   foods_to_avoid: z.array(z.string()).describe('A list of foods the user should avoid, in Bengali.'),
   daily_meal_plan: z.object({
     breakfast: z.string().describe('Suggested breakfast for the user, in Bengali.'),
@@ -45,6 +46,7 @@ User info: Name={{name}}, Age={{age}}, Height={{height}}, Weight={{weight}}, Hea
 Return JSON:
 {
  "recommended_foods":["",""],
+ "budget_friendly_foods":["",""],
  "foods_to_avoid":["",""],
  "daily_meal_plan":{
     "breakfast":"..","lunch":"..","dinner":"..","snacks":".."
