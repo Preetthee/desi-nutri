@@ -3,13 +3,7 @@
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Home, BarChart, Calculator, HeartPulse } from 'lucide-react';
-import {
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-} from '@/components/ui/sidebar';
-import { Logo } from '@/components/logo';
+import { cn } from '@/lib/utils';
 
 const links = [
   { href: '/', label: 'Home', icon: Home },
@@ -22,32 +16,22 @@ export function AppSidebar() {
   const pathname = usePathname();
 
   return (
-    <div className="flex h-full flex-col">
-      <SidebarHeader className="p-4">
-        <div className="flex items-center gap-3">
-          <Logo />
-          <span className="text-xl font-semibold font-headline group-data-[collapsible=icon]:hidden">
-            Nutrition Navigator
-          </span>
-        </div>
-      </SidebarHeader>
-      <SidebarMenu className="flex-1">
+    <nav className="fixed bottom-0 left-0 right-0 z-10 border-t bg-background/95 backdrop-blur-sm">
+      <div className="mx-auto flex h-16 max-w-md items-center justify-around">
         {links.map((link) => (
-          <SidebarMenuItem key={link.href}>
-            <SidebarMenuButton
-              asChild
-              isActive={pathname === link.href}
-              tooltip={link.label}
-              className="justify-start"
-            >
-              <Link href={link.href}>
-                <link.icon className="h-5 w-5" />
-                <span>{link.label}</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
+          <Link
+            href={link.href}
+            key={link.href}
+            className={cn(
+              'flex flex-col items-center gap-1 rounded-md p-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground',
+              pathname === link.href && 'text-primary'
+            )}
+          >
+            <link.icon className="h-5 w-5" />
+            <span>{link.label}</span>
+          </Link>
         ))}
-      </SidebarMenu>
-    </div>
+      </div>
+    </nav>
   );
 }
