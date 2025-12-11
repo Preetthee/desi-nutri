@@ -3,6 +3,7 @@ import './globals.css';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
 import { AppSidebar } from '@/components/app-sidebar';
+import { SidebarProvider } from '@/components/ui/sidebar';
 
 export const metadata: Metadata = {
   title: 'Nutrition Navigator',
@@ -29,10 +30,12 @@ export default function RootLayout({
         />
       </head>
       <body className={cn('font-body antialiased')}>
-        <div className="relative flex h-screen w-full flex-col">
-          <main className="flex-1 overflow-y-auto pb-20">{children}</main>
-          <AppSidebar />
-        </div>
+        <SidebarProvider>
+          <div className="relative flex h-screen w-full flex-col md:flex-row">
+            <AppSidebar />
+            <main className="flex-1 overflow-y-auto pb-16 md:pb-0">{children}</main>
+          </div>
+        </SidebarProvider>
         <Toaster />
       </body>
     </html>
