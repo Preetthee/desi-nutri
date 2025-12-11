@@ -1,35 +1,20 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import Image from 'next/image';
 import { useLocalStorage } from '@/hooks/use-local-storage';
-import type { UserProfile } from '@/lib/types';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
+import type { UserProfile, CalorieLog } from '@/lib/types';
+import { generateHealthTip, type GenerateHealthTipOutput } from '@/ai/flows/generate-health-tip';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowRight, HeartPulse, Calculator } from 'lucide-react';
+import { HeartPulse, TrendingUp, TrendingDown, ArrowRight, Lightbulb } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-
-const featureCards = [
-  {
-    title: 'Food Doctor',
-    description: 'Get personalized food recommendations and meal plans.',
-    href: '/food-doctor',
-    icon: HeartPulse,
-    imageId: 'food-doctor',
-  },
-  {
-    title: 'Calorie Tracker',
-    description: 'Estimate calories for your meals with AI.',
-    href: '/calorie-tracker',
-    icon: Calculator,
-    imageId: 'calorie-tracker',
-  },
-];
+import { startOfToday, startOfYesterday, isSameDay } from 'date-fns';
 
 export default function Home() {
   const [profile] = useLocalStorage<UserProfile | null>('userProfile', null);
+  const [logs] = useLocalStorage<CalorieLog[]>('calorieLogs', []);
+  const [healthTip, setHealthTip] = useState<GenerateHealthTipOutput | null>(null);
+  const [isLoadingTip, setIsLoadingTip] = useState(true);
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
 
@@ -42,6 +27,55 @@ export default function Home() {
       router.replace('/onboarding');
     }
   }, [isClient, profile, router]);
+
+  useEffect(() => {
+    if (isClient && profile) {
+      const fetchHealthTip = async () => {
+        setIsLoadingTip(true);
+        try {
+          const tip = await generateHealthTip({ name: profile.name, health_info: profile.health_info });
+          setHealthTip(tip);
+        } catch (error) {
+          console.error("Failed to fetch health tip:", error);
+          // Set a default tip on error
+          setHealthTip({
+            suggestion: "Stay hydrated by drinking plenty of water.",
+            explanation: "Good hydration is essential for overall health and can also aid in weight management."
+          });
+        } finally {
+          setIsLoadingTip(false);
+        }
+      };
+      fetchHealthTip();
+    }
+  }, [isClient, profile]);
+
+  const { todayCalories, trendPercentage } = useMemo(() => {
+    if (!isClient) return { todayCalories: 0, trendPercentage: 0 };
+    
+    const today = startOfToday();
+    const yesterday = startOfYesterday();
+
+    const todayCalories = logs
+      .filter(log => isSameDay(new Date(log.date), today))
+      .reduce((sum, log) => sum + log.total_calories, 0);
+
+    const yesterdayCalories = logs
+      .filter(log => isSameDay(new Date(log.date), yesterday))
+      .reduce((sum, log) => sum + log.total_calories, 0);
+
+    let trendPercentage = 0;
+    if (yesterdayCalories > 0) {
+      trendPercentage = ((todayCalories - yesterdayCalories) / yesterdayCalories) * 100;
+    } else if (todayCalories > 0) {
+      trendPercentage = 100; // If yesterday was 0 and today is not, it's a 100% increase
+    }
+
+    return { todayCalories, trendPercentage };
+  }, [logs, isClient]);
+
+  const TrendIcon = trendPercentage > 0 ? TrendingUp : trendPercentage < 0 ? TrendingDown : ArrowRight;
+  const trendColor = trendPercentage > 0 ? 'text-red-500' : trendPercentage < 0 ? 'text-green-500' : 'text-muted-foreground';
 
   if (!isClient || !profile) {
     return (
@@ -59,46 +93,59 @@ export default function Home() {
             Welcome back, {profile.name}!
           </h1>
           <p className="text-muted-foreground">
-            What would you like to do today?
+            Here's your daily health snapshot.
           </p>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
-          {featureCards.map((feature) => {
-            const image = PlaceHolderImages.find(
-              (img) => img.id === feature.imageId
-            );
-            return (
-              <Link href={feature.href} key={feature.href}>
-                <Card className="group h-full overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1">
-                  <CardHeader className="flex-row items-center gap-4 space-y-0 pb-2">
-                    <div className="grid h-10 w-10 place-items-center rounded-lg bg-primary/10 text-primary">
-                      <feature.icon className="h-6 w-6" />
-                    </div>
-                    <CardTitle className="font-headline">{feature.title}</CardTitle>
-                    <ArrowRight className="ml-auto h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-1" />
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground mb-4">{feature.description}</p>
-                    <div className="relative aspect-video w-full overflow-hidden rounded-md">
-                      {image ? (
-                        <Image
-                          src={image.imageUrl}
-                          alt={image.description}
-                          fill
-                          className="object-cover transition-transform group-hover:scale-105"
-                          data-ai-hint={image.imageHint}
-                        />
-                      ) : (
-                        <Skeleton className="h-full w-full" />
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            );
-          })}
+          <Card>
+            <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Today's Calorie Intake</CardTitle>
+              <HeartPulse className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{todayCalories.toLocaleString()}</div>
+              <p className="text-xs text-muted-foreground">Total calories consumed today</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Daily Trend</CardTitle>
+              <TrendIcon className={`h-4 w-4 ${trendColor}`} />
+            </CardHeader>
+            <CardContent>
+              <div className={`text-2xl font-bold ${trendColor}`}>
+                {trendPercentage !== 0 && (trendPercentage > 0 ? '+' : '')}
+                {trendPercentage.toFixed(1)}%
+              </div>
+              <p className="text-xs text-muted-foreground">Compared to yesterday</p>
+            </CardContent>
+          </Card>
         </div>
+
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Lightbulb className="text-primary" />
+              Your Daily Health Tip
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isLoadingTip ? (
+              <div className="space-y-2">
+                <Skeleton className="h-5 w-3/4" />
+                <Skeleton className="h-4 w-full" />
+              </div>
+            ) : (
+              healthTip && (
+                <>
+                  <p className="font-semibold text-lg">"{healthTip.suggestion}"</p>
+                  <p className="text-muted-foreground mt-2">{healthTip.explanation}</p>
+                </>
+              )
+            )}
+          </CardContent>
+        </Card>
       </main>
     </div>
   );
