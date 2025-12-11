@@ -1,3 +1,16 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "food-doctor",
+      "description": "A vibrant picture of healthy foods.",
+      "imageUrl": "https://images.unsplash.com/photo-1493770348161-369560ae357d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8aGVhbHRoeSUyMGZvb2R8ZW58MHx8fHwxNzY1MzMwNzkxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "healthy food"
+    },
+    {
+      "id": "calorie-tracker",
+      "description": "An image related to tracking or measurement.",
+      "imageUrl": "https://images.unsplash.com/photo-1522836924445-4478bdeb860c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxub3RlYm9vayUyMGpvdXJuYWx8ZW58MHx8fHwxNzY1MzIzNjQzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "notebook journal"
+    }
+  ]
 }
