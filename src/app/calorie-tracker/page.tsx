@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { estimateCalories } from '@/ai/flows/estimate-calories-from-food-text';
-import type { CalorieLog } from '@/lib/lib/types';
+import type { CalorieLog } from '@/lib/types';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -63,7 +63,7 @@ export default function CalorieTrackerPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold font-headline tracking-tight">ক্যালোরি ট্র্যাকার</h1>
-          <p className="text-muted-foreground">আপনার খাবার লগ করুন এবং AI কে গণনা করতে দিন।</p>
+          <p className="text-muted-foreground">আপনার খাবার লগ করুন এবং AI-কে গণনা করতে দিন।</p>
         </div>
       </div>
       <div className="grid gap-8 lg:grid-cols-2">
@@ -71,7 +71,7 @@ export default function CalorieTrackerPage() {
           <CardHeader>
             <CardTitle>নতুন খাবার লগ করুন</CardTitle>
             <CardDescription>
-              আপনি কী খেয়েছেন তা বর্ণনা করুন, যেমন, "এক বাটি ওটমিল সাথে ব্লুবেরি এবং একটি কফি"।
+              আপনি কী খেয়েছেন তা বর্ণনা করুন, যেমন: "এক বাটি ওটস সাথে ব্লুবেরি এবং একটি কফি"।
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -83,7 +83,7 @@ export default function CalorieTrackerPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Textarea placeholder="उदा: ২টি আটার রুটি সাথে অ্যাভোকাডো এবং একটি ভাজা ডিম" {...field} />
+                        <Textarea placeholder="উদাহরণ: ২টি রুটি, সবজি এবং এক টুকরো মাছ।" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

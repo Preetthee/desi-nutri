@@ -3,8 +3,9 @@
 import { useState, useTransition, useEffect } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { generateFoodSuggestions } from '@/ai/flows/food-suggestions-from-profile';
-import { checkFoodAppropriateness, type CheckFoodAppropriatenessOutput } from '@/ai/flows/check-food-appropriateness';
-import type { FoodSuggestions, UserProfile } from '@/lib/lib/types';
+import { checkFoodAppropriateness } from '@/ai/flows/check-food-appropriateness';
+import type { CheckFoodAppropriatenessOutput } from '@/ai/flows/check-food-appropriateness';
+import type { FoodSuggestions, UserProfile } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -155,7 +156,7 @@ export default function FoodDoctorPage() {
         <CardHeader>
           <CardTitle>কোনো খাবার পরীক্ষা করুন</CardTitle>
           <CardDescription>
-            কোনো নির্দিষ্ট খাবার আপনার জন্য উপযুক্ত কিনা তা জানতে এখানে তার নাম লিখুন।
+            কোনো নির্দিষ্ট খাবার আপনার জন্য উপযুক্ত কি না তা জানতে এখানে তার নাম লিখুন।
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -167,7 +168,7 @@ export default function FoodDoctorPage() {
                 render={({ field }) => (
                   <FormItem className="flex-1">
                     <FormControl>
-                      <Input placeholder="उदा: আম" {...field} />
+                      <Input placeholder="উদাহরণ: আম" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

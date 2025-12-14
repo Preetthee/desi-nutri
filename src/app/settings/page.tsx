@@ -91,7 +91,7 @@ export default function SettingsPage() {
                   <FormItem>
                     <FormLabel>নাম</FormLabel>
                     <FormControl>
-                      <Input placeholder="उदा: জন ডো" {...field} />
+                      <Input placeholder="উদাহরণ: জন ডো" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -105,7 +105,7 @@ export default function SettingsPage() {
                     <FormItem>
                       <FormLabel>বয়স</FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="उदा: ৩০" {...field} />
+                        <Input type="number" placeholder="উদাহরণ: ৩০" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -118,7 +118,7 @@ export default function SettingsPage() {
                     <FormItem>
                       <FormLabel>উচ্চতা (সেমি)</FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="उदा: ১৭০" {...field} />
+                        <Input type="number" placeholder="উদাহরণ: ১৭০" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -131,7 +131,7 @@ export default function SettingsPage() {
                     <FormItem>
                       <FormLabel>ওজন (কেজি)</FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="उदा: ৬৫" {...field} />
+                        <Input type="number" placeholder="উদাহরণ: ৬৫" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -146,7 +146,7 @@ export default function SettingsPage() {
                     <FormLabel>স্বাস্থ্য সম্পর্কিত তথ্য ও লক্ষ্য</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="उदा: ওজন কমাতে চাই, গ্লুটেন অ্যালার্জি আছে, নিরামিষাশী।"
+                        placeholder="উদাহরণ: ওজন কমাতে চাই, নিরামিষাশী।"
                         {...field}
                       />
                     </FormControl>
