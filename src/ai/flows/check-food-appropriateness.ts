@@ -18,13 +18,13 @@ const UserProfileSchema = z.object({
   health_info: z.string(),
 });
 
-export const CheckFoodAppropriatenessInputSchema = z.object({
+const CheckFoodAppropriatenessInputSchema = z.object({
   profile: UserProfileSchema.describe("The user's health profile."),
   foodName: z.string().describe('The name of the food to check.'),
 });
 export type CheckFoodAppropriatenessInput = z.infer<typeof CheckFoodAppropriatenessInputSchema>;
 
-export const CheckFoodAppropriatenessOutputSchema = z.object({
+const CheckFoodAppropriatenessOutputSchema = z.object({
   isAllowed: z.boolean().describe('Whether the user is allowed to eat the food.'),
   recommendation: z.string().describe('A detailed recommendation about the food, including portion size if allowed, in Bengali.'),
   reason: z.string().describe('The reason for the recommendation, in Bengali.'),
