@@ -3,31 +3,46 @@
 import { useState, useTransition, useEffect } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { generateFoodSuggestions } from '@/ai/flows/food-suggestions-from-profile';
+import { checkFoodAppropriateness, type CheckFoodAppropriatenessOutput } from '@/ai/flows/check-food-appropriateness';
 import type { FoodSuggestions, UserProfile } from '@/lib/lib/types';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { RefreshCw, Leaf, Siren, Utensils, Wallet } from 'lucide-react';
+import { RefreshCw, Leaf, Siren, Utensils, Wallet, CheckCircle, XCircle, Bot } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+
+const formSchema = z.object({
+  foodName: z.string().min(2, 'অনুগ্রহ করে একটি খাবারের নাম লিখুন।'),
+});
 
 export default function FoodDoctorPage() {
-  const [suggestions, setSuggestions] = useLocalStorage<FoodSuggestions | null>(
-    'foodSuggestions',
-    null
-  );
+  const [suggestions, setSuggestions] = useLocalStorage<FoodSuggestions | null>('foodSuggestions', null);
   const [profile] = useLocalStorage<UserProfile | null>('userProfile', null);
-  const [isPending, startTransition] = useTransition();
+  const [isGeneratingSuggestions, startGeneratingSuggestions] = useTransition();
+  const [isCheckingFood, startCheckingFood] = useTransition();
+  const [foodCheckResult, setFoodCheckResult] = useState<CheckFoodAppropriatenessOutput | null>(null);
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: { foodName: '' },
+  });
 
   useEffect(() => {
     setIsClient(true);
     if (!suggestions) {
-      handleGenerate();
+      handleGenerateSuggestions();
     }
   }, []);
 
-  const handleGenerate = () => {
+  const handleGenerateSuggestions = () => {
     if (!profile) {
       toast({
         title: 'ত্রুটি',
@@ -37,7 +52,7 @@ export default function FoodDoctorPage() {
       return;
     }
 
-    startTransition(async () => {
+    startGeneratingSuggestions(async () => {
       try {
         const result = await generateFoodSuggestions(profile);
         setSuggestions(result);
@@ -51,6 +66,36 @@ export default function FoodDoctorPage() {
       }
     });
   };
+
+  const onFoodCheckSubmit = (values: z.infer<typeof formSchema>) => {
+    if (!profile) {
+      toast({
+        title: 'ত্রুটি',
+        description: 'প্রথমে আপনার প্রোফাইল সেট আপ করুন।',
+        variant: 'destructive',
+      });
+      return;
+    }
+    setFoodCheckResult(null);
+    startCheckingFood(async () => {
+      try {
+        const result = await checkFoodAppropriateness({
+          profile,
+          foodName: values.foodName,
+        });
+        setFoodCheckResult(result);
+      } catch (error) {
+        console.error('Error checking food:', error);
+        toast({
+          title: 'AI ত্রুটি',
+          description: 'খাবারটি পরীক্ষা করতে ব্যর্থ। অনুগ্রহ করে আবার চেষ্টা করুন।',
+          variant: 'destructive',
+        });
+      }
+    });
+  };
+  
+  const isPending = isGeneratingSuggestions;
 
   const renderSkeleton = () => (
     <div className="space-y-8">
@@ -100,11 +145,63 @@ export default function FoodDoctorPage() {
           <h1 className="text-3xl font-bold font-headline tracking-tight">ফুড ডক্টর</h1>
           <p className="text-muted-foreground">আপনার ব্যক্তিগত AI-চালিত পুষ্টি নির্দেশিকা।</p>
         </div>
-        <Button onClick={() => { setSuggestions(null); handleGenerate(); }} disabled={isPending}>
+        <Button onClick={() => { setSuggestions(null); handleGenerateSuggestions(); }} disabled={isPending}>
           <RefreshCw className={`mr-2 h-4 w-4 ${isPending ? 'animate-spin' : ''}`} />
           পুনরায় তৈরি করুন
         </Button>
       </div>
+
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle>কোনো খাবার পরীক্ষা করুন</CardTitle>
+          <CardDescription>
+            কোনো নির্দিষ্ট খাবার আপনার জন্য উপযুক্ত কিনা তা জানতে এখানে তার নাম লিখুন।
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onFoodCheckSubmit)} className="flex items-start gap-4">
+              <FormField
+                control={form.control}
+                name="foodName"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormControl>
+                      <Input placeholder="उदा: আম" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" disabled={isCheckingFood}>
+                <Bot className={`mr-2 h-4 w-4 ${isCheckingFood ? 'animate-pulse' : ''}`} />
+                {isCheckingFood ? 'পরীক্ষা চলছে...' : 'পরীক্ষা করুন'}
+              </Button>
+            </form>
+          </Form>
+          {isCheckingFood && (
+            <div className="mt-4 space-y-2">
+              <Skeleton className="h-5 w-1/4" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-2/3" />
+            </div>
+          )}
+          {foodCheckResult && (
+            <Alert className="mt-4" variant={foodCheckResult.isAllowed ? 'default' : 'destructive'}>
+               {foodCheckResult.isAllowed ? (
+                <CheckCircle className="h-4 w-4" />
+              ) : (
+                <XCircle className="h-4 w-4" />
+              )}
+              <AlertTitle>{foodCheckResult.isAllowed ? 'খেতে পারেন' : 'খাওয়া উচিত নয়'}</AlertTitle>
+              <AlertDescription>
+                <p className="font-semibold">{foodCheckResult.recommendation}</p>
+                <p className="text-xs">{foodCheckResult.reason}</p>
+              </AlertDescription>
+            </Alert>
+          )}
+        </CardContent>
+      </Card>
 
       {isPending && (!suggestions || isClient) ? (
         renderSkeleton()
