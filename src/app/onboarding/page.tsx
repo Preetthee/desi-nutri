@@ -25,9 +25,9 @@ const formSchema = z.object({
   name: z.string().min(2, {
     message: 'নাম কমপক্ষে ২ অক্ষরের হতে হবে।',
   }),
-  age: z.coerce.number().min(1, 'বয়স आवश्यक।'),
-  height: z.coerce.number().min(1, 'উচ্চতা (সেমি) आवश्यक।'),
-  weight: z.coerce.number().min(1, 'ওজন (কেজি) आवश्यक।'),
+  age: z.coerce.number().min(1, 'বয়স আবশ্যক।'),
+  height: z.coerce.number().min(1, 'উচ্চতা (সেমি) আবশ্যক।'),
+  weight: z.coerce.number().min(1, 'ওজন (কেজি) আবশ্যক।'),
   health_info: z.string().min(10, 'অনুগ্রহ করে কিছু স্বাস্থ্য সম্পর্কিত তথ্য দিন।'),
 });
 
@@ -56,8 +56,8 @@ export default function OnboardingPage() {
       <Card className="w-full max-w-lg">
         <CardHeader className="items-center text-center">
             <Logo className="mb-2"/>
-          <CardTitle className="text-2xl font-headline">পুষ্টি நேভিগেটরে স্বাগতম</CardTitle>
-          <CardDescription>আপনার অভিজ্ঞতা ব্যক্তিগতকৃত করতে আসুন আমরা আপনাকে জানি।</CardDescription>
+          <CardTitle className="text-2xl font-headline">দেশি নিউট্রিতে স্বাগতম</CardTitle>
+          <CardDescription>আপনার অভিজ্ঞতা ব্যক্তিগতকৃত করতে আপনার সম্পর্কে কিছু তথ্য দিন।</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -69,7 +69,7 @@ export default function OnboardingPage() {
                   <FormItem>
                     <FormLabel>নাম</FormLabel>
                     <FormControl>
-                      <Input placeholder="उदा: जेन डो" {...field} />
+                      <Input placeholder="उदा: জন ডো" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -129,7 +129,7 @@ export default function OnboardingPage() {
                       />
                     </FormControl>
                     <FormDescription>
-                      এটি আপনাকে আরও ভালো সুপারিশ তৈরি করতে সাহায্য করে।
+                      এটি আমাদের আপনাকে আরও ভালো পরামর্শ দিতে সাহায্য করবে।
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

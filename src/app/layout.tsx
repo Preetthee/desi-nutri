@@ -6,7 +6,7 @@ import { AppSidebar } from '@/components/app-sidebar';
 import { SidebarProvider } from '@/components/ui/sidebar';
 
 export const metadata: Metadata = {
-  title: 'পুষ্টি நேভিগেটর',
+  title: 'দেশি নিউট্রি',
   description: 'পুষ্টি এবং ক্যালোরি ট্র্যাকিংয়ের জন্য আপনার স্মার্ট গাইড।',
 };
 

@@ -83,7 +83,7 @@ export default function CalorieTrackerPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Textarea placeholder="उदा: ২ টি আটার রুটি সাথে অ্যাভোকাডো এবং একটি ভাজা ডিম" {...field} />
+                        <Textarea placeholder="उदा: ২টি আটার রুটি সাথে অ্যাভোকাডো এবং একটি ভাজা ডিম" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

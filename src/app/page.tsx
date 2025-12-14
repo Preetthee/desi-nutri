@@ -39,7 +39,7 @@ export default function Home() {
           console.error("Failed to fetch health tip:", error);
           setHealthTip({
             suggestion: "প্রচুর পানি পান করে হাইড্রেটেড থাকুন।",
-            explanation: "ಉತ್ತಮ ಜಲಸಂಚಯನವು ஒட்டுமொத்த ಆರೋಗ್ಯಕ್ಕೆ ಅವಶ್ಯಕವಾಗಿದೆ ಮತ್ತು ತೂಕ ನಿರ್ವಹണೆಗೆ ಸಹಾಯ ಮಾಡುತ್ತದೆ."
+            explanation: "সঠিক হাইড্রেশন সার্বিক স্বাস্থ্যের জন্য অপরিহার্য এবং ওজন নিয়ন্ত্রণে সহায়তা করতে পারে।"
           });
         } finally {
           setIsLoadingTip(false);
@@ -92,7 +92,7 @@ export default function Home() {
             আবারও স্বাগতম, {profile.name}!
           </h1>
           <p className="text-muted-foreground">
-            এখানে আপনার দৈনিক স্বাস্থ্যের স্ন্যাপশট।
+            এখানে আপনার দৈনিক স্বাস্থ্যের একটি চিত্র।
           </p>
         </div>
 

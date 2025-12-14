@@ -91,7 +91,7 @@ export default function SettingsPage() {
                   <FormItem>
                     <FormLabel>নাম</FormLabel>
                     <FormControl>
-                      <Input placeholder="उदा: जेन डो" {...field} />
+                      <Input placeholder="उदा: জন ডো" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -151,7 +151,7 @@ export default function SettingsPage() {
                       />
                     </FormControl>
                     <FormDescription>
-                      এটি আপনাকে আরও ভালো সুপারিশ তৈরি করতে সাহায্য করে।
+                      এটি আমাদের আপনাকে আরও ভালো পরামর্শ দিতে সাহায্য করবে।
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
