@@ -8,7 +8,6 @@
  */
 
 import { ai } from '@/ai/genkit';
-import { UserProfile } from '@/lib/types';
 import { z } from 'genkit';
 
 const UserProfileSchema = z.object({
@@ -20,7 +19,7 @@ const UserProfileSchema = z.object({
 });
 
 export const CheckFoodAppropriatenessInputSchema = z.object({
-  profile: UserProfileSchema.describe('The user\'s health profile.'),
+  profile: UserProfileSchema.describe("The user's health profile."),
   foodName: z.string().describe('The name of the food to check.'),
 });
 export type CheckFoodAppropriatenessInput = z.infer<typeof CheckFoodAppropriatenessInputSchema>;
@@ -32,15 +31,19 @@ export const CheckFoodAppropriatenessOutputSchema = z.object({
 });
 export type CheckFoodAppropriatenessOutput = z.infer<typeof CheckFoodAppropriatenessOutputSchema>;
 
-export async function checkFoodAppropriateness(input: CheckFoodAppropriatenessInput): Promise<CheckFoodAppropriatenessOutput> {
-  return checkFoodFlow(input);
-}
 
-const prompt = ai.definePrompt({
-  name: 'checkFoodAppropriatenessPrompt',
-  input: { schema: CheckFoodAppropriatenessInputSchema },
-  output: { schema: CheckFoodAppropriatenessOutputSchema },
-  prompt: `You are an expert nutritionist. A user wants to know if they can eat a specific food based on their health profile.
+const checkFoodFlow = ai.defineFlow(
+  {
+    name: 'checkFoodFlow',
+    inputSchema: CheckFoodAppropriatenessInputSchema,
+    outputSchema: CheckFoodAppropriatenessOutputSchema,
+  },
+  async (input) => {
+    const prompt = ai.definePrompt({
+      name: 'checkFoodAppropriatenessPrompt',
+      input: { schema: CheckFoodAppropriatenessInputSchema },
+      output: { schema: CheckFoodAppropriatenessOutputSchema },
+      prompt: `You are an expert nutritionist. A user wants to know if they can eat a specific food based on their health profile.
 The entire response must be in Bengali.
 
 User Profile:
@@ -71,16 +74,13 @@ Example for a user with gluten allergy asking about "Roti":
   "reason": "আপনার গ্লুটেন অ্যালার্জি আছে এবং গমের রুটিতে গ্লুটেন থাকে, যা আপনার জন্য ক্ষতিকর হতে পারে।"
 }
 `,
-});
+    });
 
-const checkFoodFlow = ai.defineFlow(
-  {
-    name: 'checkFoodFlow',
-    inputSchema: CheckFoodAppropriatenessInputSchema,
-    outputSchema: CheckFoodAppropriatenessOutputSchema,
-  },
-  async (input) => {
     const { output } = await prompt(input);
     return output!;
   }
 );
+
+export async function checkFoodAppropriateness(input: CheckFoodAppropriatenessInput): Promise<CheckFoodAppropriatenessOutput> {
+  return await checkFoodFlow(input);
+}
