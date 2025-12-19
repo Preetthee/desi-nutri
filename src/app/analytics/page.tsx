@@ -149,7 +149,7 @@ export default function AnalyticsPage() {
                     {t('analytics.calendar_view.description', { total: monthTotalCalories.toLocaleString(numberLocale)})}
                 </CardDescription>
             </CardHeader>
-            <CardContent className="flex justify-center">
+            <CardContent>
                 {isClient ? (
                     <Calendar
                         mode="single"
@@ -174,7 +174,7 @@ export default function AnalyticsPage() {
                         }}
 
                     />
-                ) : <Skeleton className="w-[350px] h-[337px]" />}
+                ) : <Skeleton className="w-full h-[337px]" />}
             </CardContent>
         </Card>
 
