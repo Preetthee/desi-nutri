@@ -21,7 +21,8 @@ import {
   getDaysInMonth,
   getDay,
   addMonths,
-  subMonths
+  subMonths,
+  addDays
 } from 'date-fns';
 import { bn, enUS } from 'date-fns/locale';
 import { useTranslation } from '@/contexts/language-provider';
@@ -68,7 +69,7 @@ export default function AnalyticsPage() {
 
   const weekdays = useMemo(() => {
       const firstDayOfWeek = startOfWeek(new Date(), { locale: dateLocale });
-      return Array.from({ length: 7 }).map((_, i) => format(addMonths(firstDayOfWeek, i), 'EEE', { locale: dateLocale }));
+      return Array.from({ length: 7 }).map((_, i) => format(addDays(firstDayOfWeek, i), 'EEE', { locale: dateLocale }));
   }, [locale, dateLocale]);
 
   const dailyLogs = useMemo(() => {
@@ -173,9 +174,9 @@ export default function AnalyticsPage() {
                     {t('analytics.calendar_view.description', { total: monthTotalCalories.toLocaleString(numberLocale)})}
                 </CardDescription>
             </CardHeader>
-            <CardContent className="flex justify-center">
+            <CardContent>
                 {isClient ? (
-                  <div className="w-full max-w-lg">
+                  <div className="w-full max-w-lg mx-auto">
                     <div className="flex items-center justify-between mb-4">
                         <Button variant="outline" size="icon" onClick={() => changeMonth(-1)}>
                             <ChevronLeft className="h-4 w-4" />
@@ -188,7 +189,7 @@ export default function AnalyticsPage() {
                         </Button>
                     </div>
                     <div className="grid grid-cols-7 text-center text-sm text-muted-foreground">
-                        {weekdays.map(day => <div key={day} className="font-medium pb-2">{day}</div>)}
+                        {weekdays.map((day, index) => <div key={`day-${index}`} className="font-medium pb-2">{day}</div>)}
                     </div>
                     <div className="grid grid-cols-7 gap-1">
                         {calendarDays.map((day, index) => {
