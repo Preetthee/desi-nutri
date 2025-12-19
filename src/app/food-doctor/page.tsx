@@ -223,7 +223,7 @@ export default function FoodDoctorPage() {
                 </div>
                 <div className="space-y-1">
                   <h3 className="font-semibold">{t('food_doctor.meal_plan.lunch')}</h3>
-                  <p className="text-muted-foreground">{suggestions.daily_manual_plan.lunch}</p>
+                  <p className="text-muted-foreground">{suggestions.daily_meal_plan.lunch}</p>
                 </div>
                 <div className="space-y-1">
                   <h3 className="font-semibold">{t('food_doctor.meal_plan.dinner')}</h3>
@@ -289,3 +289,5 @@ export default function FoodDoctorPage() {
     </main>
   );
 }
+
+    
