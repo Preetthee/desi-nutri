@@ -23,7 +23,6 @@ import {
 import { bn, enUS } from 'date-fns/locale';
 import { useTranslation } from '@/contexts/language-provider';
 import { Skeleton } from '@/components/ui/skeleton';
-import { DayContent as DayContentPrimitive, DayContentProps } from 'react-day-picker';
 
 const chartConfig = {
   calories: {
@@ -134,17 +133,6 @@ export default function AnalyticsPage() {
     
     return data.some(d => d.calories > 0) ? data : [];
   }, [date, dailyLogs, isClient, locale]);
-
-  const CustomDayContent = (props: DayContentProps) => {
-    const dayKey = format(props.date, 'yyyy-MM-dd');
-    const hasLog = dailyLogs.has(dayKey);
-    return (
-      <div className="relative w-full h-full flex items-center justify-center">
-        <DayContentPrimitive {...props} />
-        {hasLog && <div className="absolute bottom-1 h-1.5 w-1.5 rounded-full bg-primary" />}
-      </div>
-    );
-  };
   
   return (
     <main className="flex-1 p-4 md:p-8">
@@ -171,9 +159,20 @@ export default function AnalyticsPage() {
                         onMonthChange={setMonth}
                         className="rounded-md border"
                         locale={dateLocale}
-                        components={{
-                            DayContent: CustomDayContent,
+                        modifiers={{
+                            withLog: (day) => {
+                                const dayKey = format(day, 'yyyy-MM-dd');
+                                return dailyLogs.has(dayKey);
+                            }
                         }}
+                        modifiersStyles={{
+                            withLog: {
+                                textDecoration: 'underline',
+                                textDecorationColor: 'hsl(var(--primary))',
+                                textDecorationThickness: '2px',
+                            }
+                        }}
+
                     />
                 ) : <Skeleton className="w-full h-[300px]" />}
             </CardContent>
