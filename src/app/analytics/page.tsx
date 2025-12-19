@@ -24,6 +24,7 @@ import {
 } from 'date-fns';
 import { bn, enUS } from 'date-fns/locale';
 import { useTranslation } from '@/contexts/language-provider';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const chartConfig = {
   calories: {
