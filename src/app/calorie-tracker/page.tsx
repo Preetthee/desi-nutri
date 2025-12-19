@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useEffect } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { estimateCalories } from '@/ai/flows/estimate-calories-from-food-text';
 import type { CalorieLog } from '@/lib/types';
@@ -27,6 +27,12 @@ export default function CalorieTrackerPage() {
   const [logs, setLogs] = useLocalStorage<CalorieLog[]>('calorieLogs', []);
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -105,7 +111,9 @@ export default function CalorieTrackerPage() {
             <CardDescription>আপনার লগ করা খাবারের বিস্তারিত দেখুন।</CardDescription>
           </CardHeader>
           <CardContent>
-            {logs.length === 0 ? (
+            {!isClient ? (
+                <p className="text-center text-muted-foreground py-4">লগ লোড হচ্ছে...</p>
+            ) : logs.length === 0 ? (
                 <p className="text-center text-muted-foreground py-4">এখনও কোনো খাবার লগ করা হয়নি।</p>
             ) : (
             <Accordion type="single" collapsible className="w-full">
