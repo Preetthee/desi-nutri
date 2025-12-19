@@ -241,6 +241,7 @@ export default function AnalyticsPage() {
                         <p className="text-sm text-muted-foreground text-center py-10">{t('analytics.no_data_pie')}</p>
                     ) : <Skeleton className="w-full h-[250px]" />}
                 </CardContent>
+            </Card>
         </div>
       </div>
     </main>
