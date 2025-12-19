@@ -141,7 +141,7 @@ export default function AnalyticsPage() {
         <p className="text-muted-foreground">{t('analytics.description')}</p>
       </div>
 
-      <div className="grid gap-8 md:grid-cols-2">
+      <div className="grid gap-8">
         <Card>
             <CardHeader>
                 <CardTitle>{t('analytics.calendar_view')}</CardTitle>
@@ -174,11 +174,11 @@ export default function AnalyticsPage() {
                         }}
 
                     />
-                ) : <Skeleton className="w-full h-[300px]" />}
+                ) : <Skeleton className="w-[350px] h-[337px]" />}
             </CardContent>
         </Card>
 
-        <div className="space-y-8">
+        <div className="grid gap-8 md:grid-cols-2">
             {date && (
                 <Card>
                     <CardHeader>
@@ -186,7 +186,7 @@ export default function AnalyticsPage() {
                     </CardHeader>
                     <CardContent>
                         {selectedDayLog && selectedDayLog.length > 0 ? (
-                            <div className="space-y-4">
+                            <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
                                 {selectedDayLog.map(log => (
                                     <div key={log.id} className="text-sm border-b pb-2">
                                         <p className="font-semibold">{log.food_text}</p>
