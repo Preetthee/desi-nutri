@@ -39,9 +39,9 @@ export default function OnboardingPage() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
-      age: undefined,
-      height: undefined,
-      weight: undefined,
+      age: 0,
+      height: 0,
+      weight: 0,
       health_info: '',
     },
   });
@@ -83,7 +83,7 @@ export default function OnboardingPage() {
                     <FormItem>
                       <FormLabel>বয়স</FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="উদাহরণ: ৩০" {...field} />
+                        <Input type="number" placeholder="উদাহরণ: ৩০" {...field} onChange={e => field.onChange(e.target.valueAsNumber)} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -96,7 +96,7 @@ export default function OnboardingPage() {
                     <FormItem>
                       <FormLabel>উচ্চতা (সেমি)</FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="উদাহরণ: ১৭০" {...field} />
+                        <Input type="number" placeholder="উদাহরণ: ১৭০" {...field} onChange={e => field.onChange(e.target.valueAsNumber)} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -109,7 +109,7 @@ export default function OnboardingPage() {
                     <FormItem>
                       <FormLabel>ওজন (কেজি)</FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="উদাহরণ: ৬৫" {...field} />
+                        <Input type="number" placeholder="উদাহরণ: ৬৫" {...field} onChange={e => field.onChange(e.target.valueAsNumber)} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

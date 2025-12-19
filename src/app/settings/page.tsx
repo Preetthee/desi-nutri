@@ -133,7 +133,7 @@ export default function SettingsPage() {
                         <FormItem>
                         <FormLabel>বয়স</FormLabel>
                         <FormControl>
-                            <Input type="number" placeholder="উদাহরণ: ৩০" {...field} />
+                            <Input type="number" placeholder="উদাহরণ: ৩০" {...field} onChange={e => field.onChange(e.target.valueAsNumber)} />
                         </FormControl>
                         <FormMessage />
                         </FormItem>
@@ -146,7 +146,7 @@ export default function SettingsPage() {
                         <FormItem>
                         <FormLabel>উচ্চতা (সেমি)</FormLabel>
                         <FormControl>
-                            <Input type="number" placeholder="উদাহরণ: ১৭০" {...field} />
+                            <Input type="number" placeholder="উদাহরণ: ১৭০" {...field} onChange={e => field.onChange(e.target.valueAsNumber)} />
                         </FormControl>
                         <FormMessage />
                         </FormItem>
@@ -159,7 +159,7 @@ export default function SettingsPage() {
                         <FormItem>
                         <FormLabel>ওজন (কেজি)</FormLabel>
                         <FormControl>
-                            <Input type="number" placeholder="উদাহরণ: ৬৫" {...field} />
+                            <Input type="number" placeholder="উদাহরণ: ৬৫" {...field} onChange={e => field.onChange(e.target.valueAsNumber)} />
                         </FormControl>
                         <FormMessage />
                         </FormItem>
