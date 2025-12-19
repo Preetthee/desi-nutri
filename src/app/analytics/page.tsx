@@ -25,6 +25,7 @@ import {
 import { bn, enUS } from 'date-fns/locale';
 import { useTranslation } from '@/contexts/language-provider';
 import { Skeleton } from '@/components/ui/skeleton';
+import { DayContent, DayContentProps } from 'react-day-picker';
 
 const chartConfig = {
   calories: {
@@ -136,20 +137,15 @@ export default function AnalyticsPage() {
     return data.some(d => d.calories > 0) ? data : [];
   }, [date, dailyLogs, isClient, locale]);
 
-  const DayWithDot = ({ date, children }: { date: Date, children: React.ReactNode }) => {
-    try {
-      const dayKey = format(date, 'yyyy-MM-dd');
-      const hasLog = dailyLogs.has(dayKey);
-      return (
-          <div className="relative">
-              {children}
-              {hasLog && <div className="absolute bottom-1 left-1/2 -translate-x-1/2 h-1.5 w-1.5 rounded-full bg-primary" />}
-          </div>
-      );
-    } catch(e) {
-      // For invalid dates, just render the original children
-      return <>{children}</>;
-    }
+  const CustomDayContent = (props: DayContentProps) => {
+    const dayKey = format(props.date, 'yyyy-MM-dd');
+    const hasLog = dailyLogs.has(dayKey);
+    return (
+      <div className="relative w-full h-full flex items-center justify-center">
+        <DayContent {...props} />
+        {hasLog && <div className="absolute bottom-1 h-1.5 w-1.5 rounded-full bg-primary" />}
+      </div>
+    );
   };
   
   return (
@@ -178,7 +174,7 @@ export default function AnalyticsPage() {
                         className="rounded-md border"
                         locale={dateLocale}
                         components={{
-                            Day: DayWithDot,
+                            DayContent: CustomDayContent,
                         }}
                     />
                 ) : <Skeleton className="w-full h-[300px]" />}
