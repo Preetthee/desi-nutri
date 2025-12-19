@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
-import type { CalorieLog } from '@/lib/lib/types';
+import type { CalorieLog } from '@/lib/types';
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 import {
   ChartContainer,
@@ -18,6 +18,7 @@ import {
   subMonths,
   startOfDay,
   startOfWeek,
+  endOfWeek,
   startOfMonth,
   format,
   eachDayOfInterval,
@@ -54,7 +55,7 @@ export default function AnalyticsPage() {
           const total = logs
             .filter((log) => startOfDay(new Date(log.date)).getTime() === dayStart.getTime())
             .reduce((sum, log) => sum + log.total_calories, 0);
-          return { date: format(day, 'MMM d', { locale: bn }), calories: total };
+          return { date: format(day, 'd MMM', { locale: bn }), calories: total };
         });
         return dailyLogs;
       }
@@ -62,14 +63,14 @@ export default function AnalyticsPage() {
         const interval = { start: subWeeks(now, 7), end: now };
         const weeklyLogs = eachWeekOfInterval(interval, { weekStartsOn: 1 }).map((week) => {
            const weekStart = startOfWeek(week, { weekStartsOn: 1 });
-           const weekEnd = new Date(weekStart.getTime() + 6 * 24 * 60 * 60 * 1000);
+           const weekEnd = endOfWeek(week, { weekStartsOn: 1 });
            const total = logs
             .filter((log) => {
               const logDate = new Date(log.date);
               return logDate >= weekStart && logDate <= weekEnd;
             })
             .reduce((sum, log) => sum + log.total_calories, 0);
-          return { date: format(weekStart, 'MMM d', { locale: bn }), calories: total };
+          return { date: format(weekStart, 'd MMM', { locale: bn }), calories: total };
         });
         return weeklyLogs;
       }
@@ -80,7 +81,7 @@ export default function AnalyticsPage() {
           const total = logs
             .filter((log) => startOfMonth(new Date(log.date)).getTime() === monthStart.getTime())
             .reduce((sum, log) => sum + log.total_calories, 0);
-          return { date: format(monthStart, 'MMM yyyy', { locale: bn }), calories: total };
+          return { date: format(monthStart, 'MMM yy', { locale: bn }), calories: total };
         });
         return monthlyLogs;
       }
@@ -103,25 +104,43 @@ export default function AnalyticsPage() {
       .reduce((sum, log) => sum + log.total_calories, 0);
   }, [logs, timeRange, isClient]);
 
+  const getTitleAndDescription = () => {
+    switch (timeRange) {
+      case 'day':
+        return {
+          title: 'দৈনিক ক্যালোরি গ্রহণ',
+          description: `আজ মোট: ${totalCaloriesThisPeriod.toLocaleString('bn-BD')} ক্যালোরি`,
+        };
+      case 'week':
+        return {
+          title: 'সাপ্তাহিক ক্যালোরি গ্রহণ',
+          description: `এই সপ্তাহে মোট: ${totalCaloriesThisPeriod.toLocaleString('bn-BD')} ক্যালোরি`,
+        };
+      case 'month':
+        return {
+          title: 'মাসিক ক্যালোরি গ্রহণ',
+          description: `এই মাসে মোট: ${totalCaloriesThisPeriod.toLocaleString('bn-BD')} ক্যালোরি`,
+        };
+      default:
+        return { title: '', description: '' };
+    }
+  };
+
+  const { title, description } = getTitleAndDescription();
+
   return (
     <main className="flex-1 p-4 md:p-8">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold font-headline tracking-tight">বিশ্লেষণ</h1>
-          <p className="text-muted-foreground">আপনার ক্যালোরি গ্রহণের একটি সংক্ষিপ্ত চিত্র।</p>
+          <h1 className="text-3xl font-bold font-headline tracking-tight">ক্যালোরি বিশ্লেষণ</h1>
+          <p className="text-muted-foreground">আপনার ক্যালোরি গ্রহণের বিস্তারিত দেখুন।</p>
         </div>
       </div>
       <Card>
         <CardHeader>
-          <CardTitle>ক্যালোরি গ্রহণ</CardTitle>
+          <CardTitle>{title}</CardTitle>
            <CardDescription>
-            {
-              {
-                day: `আজ মোট: ${totalCaloriesThisPeriod.toLocaleString('bn-BD')} ক্যালোরি`,
-                week: `এই সপ্তাহে মোট: ${totalCaloriesThisPeriod.toLocaleString('bn-BD')} ক্যালোরি`,
-                month: `এই মাসে মোট: ${totalCaloriesThisPeriod.toLocaleString('bn-BD')} ক্যালোরি`,
-              }[timeRange]
-            }
+            {description}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -140,7 +159,7 @@ export default function AnalyticsPage() {
                     tickLine={false}
                     tickMargin={10}
                     axisLine={false}
-                    tickFormatter={(value) => value.slice(0, 6)}
+                    tickFormatter={(value) => value}
                   />
                    <YAxis 
                     tickLine={false}
