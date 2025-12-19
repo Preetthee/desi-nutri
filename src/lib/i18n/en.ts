@@ -13,6 +13,7 @@ export const en = {
   'sidebar.food_doctor': 'Food Doctor',
   'sidebar.calorie_tracker': 'Calorie Tracker',
   'sidebar.analytics': 'Analytics',
+  'sidebar.exercise': 'Exercise',
   'sidebar.settings': 'Settings',
 
   // Home Page
@@ -95,6 +96,24 @@ export const en = {
   'analytics.weekly_breakdown': 'Weekly Breakdown',
   'analytics.weekly_breakdown.description': 'Pie chart showing calorie distribution for the current week.',
   'analytics.no_data_pie': 'Not enough data for this week to display a chart.',
+
+  // Exercise Page
+  'exercise.title': 'Exercise Guide',
+  'exercise.description': 'Your personal AI-powered fitness coach.',
+  'exercise.bmi_status.title': 'Your Current Status',
+  'exercise.bmi_status.description': 'Your BMI is {bmi}, which is considered {status}.',
+  'exercise.bmi_status.underweight': 'Underweight',
+  'exercise.bmi_status.normal': 'Normal weight',
+  'exercise.bmi_status.overweight': 'Overweight',
+  'exercise.bmi_status.obese': 'Obese',
+  'exercise.bmi_status.recommendation': 'Regular exercise is recommended to improve your health.',
+  'exercise.plan.title': 'Your Daily Exercise Plan',
+  'exercise.plan.description': 'The AI has generated a simple exercise plan for you.',
+  'exercise.plan.checklist_title': 'Today\'s Checklist',
+  'exercise.plan.minutes': 'minutes',
+  'exercise.plan.completed': 'Great job! You\'ve completed all exercises for today!',
+  'exercise.plan.completed_subtext': 'Congratulations on your consistency!',
+
 
   // Settings Page
   'settings.title': 'Settings',

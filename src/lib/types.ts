@@ -30,3 +30,13 @@ export type CalorieLog = {
   total_calories: number;
   date: string; // ISO string
 };
+
+export type Exercise = {
+    name: string;
+    duration_minutes: number;
+};
+
+export type ExerciseSuggestion = {
+    summary: string;
+    exercises: Exercise[];
+};

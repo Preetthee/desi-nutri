@@ -13,6 +13,7 @@ export const bn = {
   'sidebar.food_doctor': 'ফুড ডক্টর',
   'sidebar.calorie_tracker': 'ক্যালোরি ট্র্যাকার',
   'sidebar.analytics': 'বিশ্লেষণ',
+  'sidebar.exercise': 'ব্যায়াম',
   'sidebar.settings': 'সেটিংস',
 
   // Home Page
@@ -95,6 +96,24 @@ export const bn = {
   'analytics.weekly_breakdown': 'সাপ্তাহিক বিশ্লেষণ',
   'analytics.weekly_breakdown.description': 'চলতি সপ্তাহের ক্যালোরি বন্টন দেখানো পাই চার্ট।',
   'analytics.no_data_pie': 'এই সপ্তাহের চার্ট দেখানোর জন্য পর্যাপ্ত ডেটা নেই।',
+
+  // Exercise Page
+  'exercise.title': 'ব্যায়াম গাইড',
+  'exercise.description': 'আপনার ব্যক্তিগত AI-চালিত ব্যায়াম প্রশিক্ষক।',
+  'exercise.bmi_status.title': 'আপনার বর্তমান অবস্থা',
+  'exercise.bmi_status.description': 'আপনার BMI হলো {bmi}, যা {status} হিসাবে বিবেচিত।',
+  'exercise.bmi_status.underweight': 'কম ওজন',
+  'exercise.bmi_status.normal': 'স্বাভাবিক ওজন',
+  'exercise.bmi_status.overweight': 'অতিরিক্ত ওজন',
+  'exercise.bmi_status.obese': 'স্থূল',
+  'exercise.bmi_status.recommendation': 'আপনার স্বাস্থ্য উন্নত করতে নিয়মিত ব্যায়াম করার পরামর্শ দেওয়া হচ্ছে।',
+  'exercise.plan.title': 'আপনার দৈনিক ব্যায়াম পরিকল্পনা',
+  'exercise.plan.description': 'এআই আপনার জন্য একটি সহজ ব্যায়াম পরিকল্পনা তৈরি করেছে।',
+  'exercise.plan.checklist_title': 'আজকের চেকলিস্ট',
+  'exercise.plan.minutes': 'মিনিট',
+  'exercise.plan.completed': 'দারুণ! আপনি আজকের সব ব্যায়াম সম্পন্ন করেছেন!',
+  'exercise.plan.completed_subtext': 'আপনার ধারাবাহিকতার জন্য অভিনন্দন!',
+
 
   // Settings Page
   'settings.title': 'সেটিংস',
