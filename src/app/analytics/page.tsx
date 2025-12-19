@@ -9,7 +9,6 @@ import {
   ChartConfig,
 } from '@/components/ui/chart';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Calendar } from '@/components/ui/calendar';
 import {
   startOfDay,
   format,
@@ -19,10 +18,17 @@ import {
   eachDayOfInterval,
   startOfMonth,
   endOfMonth,
+  getDaysInMonth,
+  getDay,
+  addMonths,
+  subMonths
 } from 'date-fns';
 import { bn, enUS } from 'date-fns/locale';
 import { useTranslation } from '@/contexts/language-provider';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const chartConfig = {
   calories: {
@@ -50,8 +56,8 @@ const dayLabelsBn = {
 
 export default function AnalyticsPage() {
   const [logs] = useLocalStorage<CalorieLog[]>('calorieLogs', []);
-  const [date, setDate] = useState<Date | undefined>(new Date());
-  const [month, setMonth] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [currentMonth, setCurrentMonth] = useState(new Date());
   const [isClient, setIsClient] = useState(false);
   const { t, locale } = useTranslation();
 
@@ -60,16 +66,10 @@ export default function AnalyticsPage() {
   const dateLocale = locale === 'bn' ? bn : enUS;
   const numberLocale = locale === 'bn' ? 'bn-BD' : 'en-US';
 
-  if (locale === 'bn') {
-    chartConfig.calories.label = 'ক্যালোরি';
-    chartConfig.sunday.label = dayLabelsBn.sunday;
-    chartConfig.monday.label = dayLabelsBn.monday;
-    chartConfig.tuesday.label = dayLabelsBn.tuesday;
-    chartConfig.wednesday.label = dayLabelsBn.wednesday;
-    chartConfig.thursday.label = dayLabelsBn.thursday;
-    chartConfig.friday.label = dayLabelsBn.friday;
-    chartConfig.saturday.label = dayLabelsBn.saturday;
-  }
+  const weekdays = useMemo(() => {
+      const firstDayOfWeek = startOfWeek(new Date(), { locale: dateLocale });
+      return Array.from({ length: 7 }).map((_, i) => format(addMonths(firstDayOfWeek, i), 'EEE', { locale: dateLocale }));
+  }, [locale, dateLocale]);
 
   const dailyLogs = useMemo(() => {
     const logMap = new Map<string, number>();
@@ -86,20 +86,20 @@ export default function AnalyticsPage() {
   }, [logs]);
 
   const selectedDayLog = useMemo(() => {
-    if (!date) return null;
+    if (!selectedDate) return null;
     return logs.filter(log => {
         try {
-            return isSameDay(new Date(log.date), date)
+            return isSameDay(new Date(log.date), selectedDate)
         } catch(e) {
             return false;
         }
     });
-  }, [logs, date]);
+  }, [logs, selectedDate]);
 
   const monthTotalCalories = useMemo(() => {
     if (!isClient) return 0;
-    const monthStart = startOfMonth(month);
-    const monthEnd = endOfMonth(month);
+    const monthStart = startOfMonth(currentMonth);
+    const monthEnd = endOfMonth(currentMonth);
     return logs
         .filter(log => {
             try {
@@ -110,15 +110,25 @@ export default function AnalyticsPage() {
             }
         })
         .reduce((sum, log) => sum + log.total_calories, 0);
-}, [logs, month, isClient]);
-
+  }, [logs, currentMonth, isClient]);
 
   const weeklyPieChartData = useMemo(() => {
-    if (!date || !isClient) return [];
+    if (!selectedDate || !isClient) return [];
     
-    const weekStart = startOfWeek(date);
-    const weekEnd = endOfWeek(date);
+    const weekStart = startOfWeek(selectedDate);
+    const weekEnd = endOfWeek(selectedDate);
     const weekDays = eachDayOfInterval({ start: weekStart, end: weekEnd });
+
+    if (locale === 'bn') {
+        chartConfig.sunday.label = dayLabelsBn.sunday;
+        chartConfig.monday.label = dayLabelsBn.monday;
+        chartConfig.tuesday.label = dayLabelsBn.tuesday;
+        chartConfig.wednesday.label = dayLabelsBn.wednesday;
+        chartConfig.thursday.label = dayLabelsBn.thursday;
+        chartConfig.friday.label = dayLabelsBn.friday;
+        chartConfig.saturday.label = dayLabelsBn.saturday;
+      }
+
 
     const data = weekDays.map(day => {
         const dayKey = format(day, 'yyyy-MM-dd');
@@ -132,7 +142,21 @@ export default function AnalyticsPage() {
     });
     
     return data.some(d => d.calories > 0) ? data : [];
-  }, [date, dailyLogs, isClient, locale]);
+  }, [selectedDate, dailyLogs, isClient, locale]);
+
+  const calendarDays = useMemo(() => {
+    const monthStart = startOfMonth(currentMonth);
+    const totalDays = getDaysInMonth(currentMonth);
+    const firstDayOfMonth = getDay(monthStart); // 0 for Sunday, 1 for Monday, etc.
+
+    const days = Array.from({ length: totalDays }, (_, i) => i + 1);
+    const paddedDays = [...Array(firstDayOfMonth).fill(null), ...days];
+    return paddedDays;
+  }, [currentMonth]);
+  
+  const changeMonth = (amount: number) => {
+    setCurrentMonth(prev => amount > 0 ? addMonths(prev, 1) : subMonths(prev, 1));
+  };
   
   return (
     <main className="flex-1 p-4 md:p-8">
@@ -149,51 +173,60 @@ export default function AnalyticsPage() {
                     {t('analytics.calendar_view.description', { total: monthTotalCalories.toLocaleString(numberLocale)})}
                 </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex justify-center">
                 {isClient ? (
-                    <Calendar
-                        mode="single"
-                        selected={date}
-                        onSelect={setDate}
-                        month={month}
-                        onMonthChange={setMonth}
-                        classNames={{
-                            months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
-                            month: "space-y-4 w-full",
-                            table: "w-full border-collapse space-y-1",
-                            head_row: "grid grid-cols-7",
-                            head_cell: "text-muted-foreground rounded-md w-full font-normal text-[0.8rem] text-center",
-                            row: "grid grid-cols-7 mt-2",
-                            cell: "h-9 w-full text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-                            day: "h-9 w-full p-0 font-normal aria-selected:opacity-100",
-                        }}
-                        modifiers={{
-                            withLog: (day) => {
-                                try {
-                                    const dayKey = format(day, 'yyyy-MM-dd');
-                                    return dailyLogs.has(dayKey);
-                                } catch (e) {
-                                    return false;
-                                }
-                            }
-                        }}
-                        modifiersStyles={{
-                            withLog: {
-                                textDecoration: 'underline',
-                                textDecorationColor: 'hsl(var(--primary))',
-                                textDecorationThickness: '2px',
-                            }
-                        }}
-                    />
+                  <div className="w-full max-w-lg">
+                    <div className="flex items-center justify-between mb-4">
+                        <Button variant="outline" size="icon" onClick={() => changeMonth(-1)}>
+                            <ChevronLeft className="h-4 w-4" />
+                        </Button>
+                        <h2 className="text-lg font-semibold font-headline">
+                            {format(currentMonth, 'MMMM yyyy', { locale: dateLocale })}
+                        </h2>
+                        <Button variant="outline" size="icon" onClick={() => changeMonth(1)}>
+                            <ChevronRight className="h-4 w-4" />
+                        </Button>
+                    </div>
+                    <div className="grid grid-cols-7 text-center text-sm text-muted-foreground">
+                        {weekdays.map(day => <div key={day} className="font-medium pb-2">{day}</div>)}
+                    </div>
+                    <div className="grid grid-cols-7 gap-1">
+                        {calendarDays.map((day, index) => {
+                            if (!day) return <div key={`empty-${index}`} />;
+                            
+                            const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+                            const dayKey = format(date, 'yyyy-MM-dd');
+                            const hasLog = dailyLogs.has(dayKey);
+
+                            return (
+                                <button
+                                    key={day}
+                                    onClick={() => setSelectedDate(date)}
+                                    className={cn(
+                                        "h-10 w-10 rounded-full flex items-center justify-center text-sm transition-colors",
+                                        isSameDay(date, new Date()) && "bg-muted text-foreground",
+                                        isSameDay(date, selectedDate) && "bg-primary text-primary-foreground",
+                                        !isSameDay(date, selectedDate) && "hover:bg-accent hover:text-accent-foreground"
+                                    )}
+                                >
+                                    <div className="relative">
+                                      {day}
+                                      {hasLog && <div className="absolute bottom-[-4px] left-1/2 -translate-x-1/2 h-1 w-1 rounded-full bg-primary" />}
+                                    </div>
+                                </button>
+                            );
+                        })}
+                    </div>
+                  </div>
                 ) : <Skeleton className="w-full h-[337px]" />}
             </CardContent>
         </Card>
 
         <div className="grid gap-8 md:grid-cols-2">
-            {date && (
+            {selectedDate && (
                 <Card>
                     <CardHeader>
-                        <CardTitle>{t('analytics.daily_log_for', { date: format(date, 'PPP', { locale: dateLocale }) })}</CardTitle>
+                        <CardTitle>{t('analytics.daily_log_for', { date: format(selectedDate, 'PPP', { locale: dateLocale }) })}</CardTitle>
                     </CardHeader>
                     <CardContent>
                         {selectedDayLog && selectedDayLog.length > 0 ? (
