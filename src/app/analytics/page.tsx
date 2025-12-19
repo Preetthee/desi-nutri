@@ -3,11 +3,9 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import type { CalorieLog } from '@/lib/types';
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Pie, PieChart, Cell, Legend, Tooltip as RechartsTooltip } from 'recharts';
+import { Pie, PieChart, Cell, Legend, Tooltip as RechartsTooltip } from 'recharts';
 import {
   ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
   ChartConfig,
 } from '@/components/ui/chart';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -25,7 +23,7 @@ import {
 import { bn, enUS } from 'date-fns/locale';
 import { useTranslation } from '@/contexts/language-provider';
 import { Skeleton } from '@/components/ui/skeleton';
-import { DayContent, DayContentProps } from 'react-day-picker';
+import { DayContent as DayContentPrimitive, DayContentProps } from 'react-day-picker';
 
 const chartConfig = {
   calories: {
@@ -142,7 +140,7 @@ export default function AnalyticsPage() {
     const hasLog = dailyLogs.has(dayKey);
     return (
       <div className="relative w-full h-full flex items-center justify-center">
-        <DayContent {...props} />
+        <DayContentPrimitive {...props} />
         {hasLog && <div className="absolute bottom-1 h-1.5 w-1.5 rounded-full bg-primary" />}
       </div>
     );
