@@ -3,8 +3,7 @@
 import { useState, useTransition, useEffect } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { generateFoodSuggestions } from '@/ai/flows/food-suggestions-from-profile';
-import { checkFoodAppropriateness } from '@/ai/flows/check-food-appropriateness';
-import type { CheckFoodAppropriatenessOutput } from '@/ai/flows/check-food-appropriateness';
+import { checkFoodAppropriateness, type CheckFoodAppropriatenessOutput } from '@/ai/flows/check-food-appropriateness';
 import type { FoodSuggestions, UserProfile } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -40,10 +39,11 @@ export default function FoodDoctorPage() {
 
   useEffect(() => {
     setIsClient(true);
-    if (!suggestions && profile) { // Only fetch if no suggestions and profile exists
+    if (isClient && !suggestions && profile) { // Only fetch if no suggestions and profile exists
       handleGenerateSuggestions();
     }
-  }, [profile]); // Depend on profile
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile, isClient]); // Depend on profile
 
   const handleGenerateSuggestions = () => {
     if (!profile) {
@@ -135,7 +135,7 @@ export default function FoodDoctorPage() {
           </CardHeader>
           <CardContent className="space-y-2">
             {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-4 w-full" />)}
-          </auditing-tool>
+          </CardContent>
         </Card>
       </div>
     </div>
@@ -223,7 +223,7 @@ export default function FoodDoctorPage() {
                 </div>
                 <div className="space-y-1">
                   <h3 className="font-semibold">{t('food_doctor.meal_plan.lunch')}</h3>
-                  <p className="text-muted-foreground">{suggestions.daily_meal_plan.lunch}</p>
+                  <p className="text-muted-foreground">{suggestions.daily_manual_plan.lunch}</p>
                 </div>
                 <div className="space-y-1">
                   <h3 className="font-semibold">{t('food_doctor.meal_plan.dinner')}</h3>
