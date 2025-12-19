@@ -17,6 +17,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableCaption } from '@/components/ui/table';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Bot } from 'lucide-react';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 const formSchema = z.object({
   foodText: z.string().min(3, 'অনুগ্রহ করে আপনি কী খেয়েছেন তা লিখুন।'),
@@ -66,7 +67,7 @@ export default function CalorieTrackerPage() {
           <p className="text-muted-foreground">আপনার খাবার লগ করুন এবং AI-কে গণনা করতে দিন।</p>
         </div>
       </div>
-      <div className="grid gap-8 lg:grid-cols-2">
+      <div className="grid gap-8">
         <Card>
           <CardHeader>
             <CardTitle>নতুন খাবার লগ করুন</CardTitle>
@@ -101,28 +102,46 @@ export default function CalorieTrackerPage() {
         <Card>
           <CardHeader>
             <CardTitle>সাম্প্রতিক লগ</CardTitle>
-            <CardDescription>আপনার শেষ কয়েকটি লগ করা খাবার।</CardDescription>
+            <CardDescription>আপনার লগ করা খাবারের বিস্তারিত দেখুন।</CardDescription>
           </CardHeader>
           <CardContent>
-            <Table>
-               {logs.length === 0 && <TableCaption>এখনও কোনো খাবার লগ করা হয়নি।</TableCaption>}
-              <TableHeader>
-                <TableRow>
-                  <TableHead>খাবার</TableHead>
-                  <TableHead className="text-right">ক্যালোরি</TableHead>
-                  <TableHead className="text-right">তারিখ</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {sortedLogs.slice(0, 5).map((log) => (
-                  <TableRow key={log.id}>
-                    <TableCell className="font-medium max-w-xs truncate">{log.food_text}</TableCell>
-                    <TableCell className="text-right font-semibold">{log.total_calories.toLocaleString('bn-BD')}</TableCell>
-                    <TableCell className="text-right text-muted-foreground">{format(new Date(log.date), 'MMM d, h:mm a', { locale: bn })}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            {logs.length === 0 ? (
+                <p className="text-center text-muted-foreground py-4">এখনও কোনো খাবার লগ করা হয়নি।</p>
+            ) : (
+            <Accordion type="single" collapsible className="w-full">
+              {sortedLogs.map((log) => (
+                <AccordionItem value={log.id} key={log.id}>
+                  <AccordionTrigger>
+                    <div className="flex justify-between w-full pr-4">
+                      <span className="font-medium max-w-xs truncate text-left">{log.food_text}</span>
+                      <div className="flex items-center gap-4">
+                        <span className="font-semibold">{log.total_calories.toLocaleString('bn-BD')} ক্যালোরি</span>
+                        <span className="text-muted-foreground text-xs hidden sm:block">{format(new Date(log.date), 'MMM d, h:mm a', { locale: bn })}</span>
+                      </div>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>খাবারের নাম</TableHead>
+                          <TableHead className="text-right">ক্যালোরি</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {log.items.map((item, index) => (
+                          <TableRow key={index}>
+                            <TableCell>{item.name}</TableCell>
+                            <TableCell className="text-right">{item.calories.toLocaleString('bn-BD')}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+             )}
           </CardContent>
         </Card>
       </div>
