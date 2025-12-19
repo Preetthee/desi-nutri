@@ -22,7 +22,8 @@ import {
   getDay,
   addMonths,
   subMonths,
-  addDays
+  addDays,
+  isAfter,
 } from 'date-fns';
 import { bn, enUS } from 'date-fns/locale';
 import { useTranslation } from '@/contexts/language-provider';
@@ -198,21 +199,24 @@ export default function AnalyticsPage() {
                             const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
                             const dayKey = format(date, 'yyyy-MM-dd');
                             const hasLog = dailyLogs.has(dayKey);
+                            const isFuture = isAfter(date, startOfDay(new Date()));
 
                             return (
                                 <button
                                     key={day}
                                     onClick={() => setSelectedDate(date)}
+                                    disabled={isFuture}
                                     className={cn(
                                         "h-10 w-10 rounded-full flex items-center justify-center text-sm transition-colors",
-                                        isSameDay(date, new Date()) && "bg-muted text-foreground",
+                                        isSameDay(date, new Date()) && !isSameDay(date, selectedDate) && "bg-muted text-foreground",
                                         isSameDay(date, selectedDate) && "bg-primary text-primary-foreground",
-                                        !isSameDay(date, selectedDate) && "hover:bg-accent hover:text-accent-foreground"
+                                        !isSameDay(date, selectedDate) && !isFuture && "hover:bg-accent hover:text-accent-foreground",
+                                        isFuture && "disabled:opacity-50 disabled:pointer-events-none"
                                     )}
                                 >
                                     <div className="relative">
                                       {day}
-                                      {hasLog && <div className="absolute bottom-[-4px] left-1/2 -translate-x-1/2 h-1 w-1 rounded-full bg-primary" />}
+                                      {hasLog && !isFuture && <div className="absolute bottom-[-4px] left-1/2 -translate-x-1/2 h-1 w-1 rounded-full bg-primary" />}
                                     </div>
                                 </button>
                             );
