@@ -76,16 +76,26 @@ export default function AnalyticsPage() {
   const dailyLogs = useMemo(() => {
     const logMap = new Map<string, number>();
     logs.forEach(log => {
-        const day = format(startOfDay(new Date(log.date)), 'yyyy-MM-dd');
-        const currentCalories = logMap.get(day) || 0;
-        logMap.set(day, currentCalories + log.total_calories);
+        try {
+            const day = format(startOfDay(new Date(log.date)), 'yyyy-MM-dd');
+            const currentCalories = logMap.get(day) || 0;
+            logMap.set(day, currentCalories + log.total_calories);
+        } catch(e) {
+            // Ignore invalid dates in logs
+        }
     });
     return logMap;
   }, [logs]);
 
   const selectedDayLog = useMemo(() => {
     if (!date) return null;
-    return logs.filter(log => isSameDay(new Date(log.date), date));
+    return logs.filter(log => {
+        try {
+            return isSameDay(new Date(log.date), date)
+        } catch(e) {
+            return false;
+        }
+    });
   }, [logs, date]);
 
   const monthTotalCalories = useMemo(() => {
@@ -94,8 +104,12 @@ export default function AnalyticsPage() {
     const monthEnd = endOfMonth(month);
     return logs
         .filter(log => {
-            const logDate = new Date(log.date);
-            return logDate >= monthStart && logDate <= monthEnd;
+            try {
+                const logDate = new Date(log.date);
+                return logDate >= monthStart && logDate <= monthEnd;
+            } catch(e) {
+                return false;
+            }
         })
         .reduce((sum, log) => sum + log.total_calories, 0);
 }, [logs, month, isClient]);
@@ -123,14 +137,19 @@ export default function AnalyticsPage() {
   }, [date, dailyLogs, isClient, locale]);
 
   const DayWithDot = ({ date, children }: { date: Date, children: React.ReactNode }) => {
-    const dayKey = format(date, 'yyyy-MM-dd');
-    const hasLog = dailyLogs.has(dayKey);
-    return (
-        <div className="relative">
-            {children}
-            {hasLog && <div className="absolute bottom-1 left-1/2 -translate-x-1/2 h-1.5 w-1.5 rounded-full bg-primary" />}
-        </div>
-    );
+    try {
+      const dayKey = format(date, 'yyyy-MM-dd');
+      const hasLog = dailyLogs.has(dayKey);
+      return (
+          <div className="relative">
+              {children}
+              {hasLog && <div className="absolute bottom-1 left-1/2 -translate-x-1/2 h-1.5 w-1.5 rounded-full bg-primary" />}
+          </div>
+      );
+    } catch(e) {
+      // For invalid dates, just render the original children
+      return <>{children}</>;
+    }
   };
   
   return (
@@ -222,7 +241,6 @@ export default function AnalyticsPage() {
                         <p className="text-sm text-muted-foreground text-center py-10">{t('analytics.no_data_pie')}</p>
                     ) : <Skeleton className="w-full h-[250px]" />}
                 </CardContent>
-            </Card>
         </div>
       </div>
     </main>
