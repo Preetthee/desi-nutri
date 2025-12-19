@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -31,20 +31,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
 import { Trash2 } from 'lucide-react';
-import { Separator } from '@/components/ui/separator';
-
-
-const formSchema = z.object({
-  name: z.string().min(2, {
-    message: 'নাম কমপক্ষে ২ অক্ষরের হতে হবে।',
-  }),
-  age: z.coerce.number().min(1, 'বয়স আবশ্যক।'),
-  height: z.coerce.number().min(1, 'উচ্চতা (সেমি) আবশ্যক।'),
-  weight: z.coerce.number().min(1, 'ওজন (কেজি) আবশ্যক।'),
-  health_info: z.string().min(10, 'অনুগ্রহ করে কিছু স্বাস্থ্য সম্পর্কিত তথ্য দিন।'),
-});
+import { useTranslation } from '@/contexts/language-provider';
 
 export default function SettingsPage() {
   const [profile, setProfile] = useLocalStorage<UserProfile | null>('userProfile', null);
@@ -52,10 +41,19 @@ export default function SettingsPage() {
   const [, setSuggestions] = useLocalStorage<FoodSuggestions | null>('foodSuggestions', null);
   const router = useRouter();
   const { toast } = useToast();
+  const { t } = useTranslation();
+
+  const formSchema = z.object({
+    name: z.string().min(2, t('onboarding.name.error')),
+    age: z.coerce.number().min(1, t('onboarding.age.error')),
+    height: z.coerce.number().min(1, t('onboarding.height.error')),
+    weight: z.coerce.number().min(1, t('onboarding.weight.error')),
+    health_info: z.string().min(10, t('onboarding.health_info.error')),
+  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
+    defaultValues: profile || {
       name: '',
       age: 0,
       height: 0,
@@ -75,8 +73,7 @@ export default function SettingsPage() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     setProfile(values);
     toast({
-        title: 'সফল',
-        description: 'আপনার প্রোফাইল সফলভাবে আপডেট করা হয়েছে।',
+        title: t('settings.profile.success'),
     })
   }
 
@@ -85,8 +82,7 @@ export default function SettingsPage() {
     setLogs([]);
     setSuggestions(null);
     toast({
-        title: 'ডেটা সাফ করা হয়েছে',
-        description: 'আপনার সমস্ত ডেটা মুছে ফেলা হয়েছে।',
+        title: t('settings.danger_zone.clear_data.success'),
     });
     router.push('/onboarding');
   }
@@ -99,15 +95,15 @@ export default function SettingsPage() {
     <main className="flex-1 p-4 md:p-8">
        <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold font-headline tracking-tight">সেটিংস</h1>
-          <p className="text-muted-foreground">আপনার ব্যক্তিগত এবং স্বাস্থ্য সম্পর্কিত তথ্য পরিচালনা করুন।</p>
+          <h1 className="text-3xl font-bold font-headline tracking-tight">{t('settings.title')}</h1>
+          <p className="text-muted-foreground">{t('settings.description')}</p>
         </div>
       </div>
       <div className="w-full max-w-2xl mx-auto space-y-8">
         <Card>
             <CardHeader>
-            <CardTitle>প্রোফাইল সম্পাদনা করুন</CardTitle>
-            <CardDescription>আপনার বিবরণ এখানে আপডেট করুন।</CardDescription>
+            <CardTitle>{t('settings.profile.title')}</CardTitle>
+            <CardDescription>{t('settings.profile.description')}</CardDescription>
             </CardHeader>
             <CardContent>
             <Form {...form}>
@@ -117,9 +113,9 @@ export default function SettingsPage() {
                     name="name"
                     render={({ field }) => (
                     <FormItem>
-                        <FormLabel>নাম</FormLabel>
+                        <FormLabel>{t('onboarding.name')}</FormLabel>
                         <FormControl>
-                        <Input placeholder="উদাহরণ: জন ডো" {...field} />
+                        <Input placeholder={t('onboarding.name.placeholder')} {...field} />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -131,9 +127,9 @@ export default function SettingsPage() {
                     name="age"
                     render={({ field }) => (
                         <FormItem>
-                        <FormLabel>বয়স</FormLabel>
+                        <FormLabel>{t('onboarding.age')}</FormLabel>
                         <FormControl>
-                            <Input type="number" placeholder="উদাহরণ: ৩০" {...field} onChange={e => field.onChange(e.target.valueAsNumber)} />
+                            <Input type="number" placeholder={t('onboarding.age.placeholder')} {...field} onChange={e => field.onChange(e.target.valueAsNumber || 0)} />
                         </FormControl>
                         <FormMessage />
                         </FormItem>
@@ -144,9 +140,9 @@ export default function SettingsPage() {
                     name="height"
                     render={({ field }) => (
                         <FormItem>
-                        <FormLabel>উচ্চতা (সেমি)</FormLabel>
+                        <FormLabel>{t('onboarding.height')}</FormLabel>
                         <FormControl>
-                            <Input type="number" placeholder="উদাহরণ: ১৭০" {...field} onChange={e => field.onChange(e.target.valueAsNumber)} />
+                            <Input type="number" placeholder={t('onboarding.height.placeholder')} {...field} onChange={e => field.onChange(e.target.valueAsNumber || 0)} />
                         </FormControl>
                         <FormMessage />
                         </FormItem>
@@ -157,9 +153,9 @@ export default function SettingsPage() {
                     name="weight"
                     render={({ field }) => (
                         <FormItem>
-                        <FormLabel>ওজন (কেজি)</FormLabel>
+                        <FormLabel>{t('onboarding.weight')}</FormLabel>
                         <FormControl>
-                            <Input type="number" placeholder="উদাহরণ: ৬৫" {...field} onChange={e => field.onChange(e.target.valueAsNumber)} />
+                            <Input type="number" placeholder={t('onboarding.weight.placeholder')} {...field} onChange={e => field.onChange(e.target.valueAsNumber || 0)} />
                         </FormControl>
                         <FormMessage />
                         </FormItem>
@@ -171,21 +167,21 @@ export default function SettingsPage() {
                     name="health_info"
                     render={({ field }) => (
                     <FormItem>
-                        <FormLabel>স্বাস্থ্য সম্পর্কিত তথ্য ও লক্ষ্য</FormLabel>
+                        <FormLabel>{t('onboarding.health_info')}</FormLabel>
                         <FormControl>
                         <Textarea
-                            placeholder="উদাহরণ: ওজন কমাতে চাই, নিরামিষাশী।"
+                            placeholder={t('onboarding.health_info.placeholder')}
                             {...field}
                         />
                         </FormControl>
                         <FormDescription>
-                        এটি আমাদের আপনাকে আরও ভালো পরামর্শ দিতে সাহায্য করবে।
+                        {t('onboarding.health_info.description')}
                         </FormDescription>
                         <FormMessage />
                     </FormItem>
                     )}
                 />
-                <Button type="submit" className="w-full">পরিবর্তনগুলি সংরক্ষণ করুন</Button>
+                <Button type="submit" className="w-full">{t('settings.profile.submit')}</Button>
                 </form>
             </Form>
             </CardContent>
@@ -193,27 +189,27 @@ export default function SettingsPage() {
 
         <Card className="border-destructive">
             <CardHeader>
-                <CardTitle className="text-destructive">বিপজ্জনক এলাকা</CardTitle>
-                <CardDescription>এই ক্রিয়াগুলি ফিরিয়ে আনা যাবে না। দয়া করে সাবধানে এগিয়ে যান।</CardDescription>
+                <CardTitle className="text-destructive">{t('settings.danger_zone.title')}</CardTitle>
+                <CardDescription>{t('settings.danger_zone.description')}</CardDescription>
             </CardHeader>
             <CardContent>
                 <AlertDialog>
                     <AlertDialogTrigger asChild>
                         <Button variant="destructive" className="w-full">
                             <Trash2 className="mr-2 h-4 w-4" />
-                            সমস্ত ডেটা সাফ করুন
+                            {t('settings.danger_zone.clear_data')}
                         </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                         <AlertDialogHeader>
-                        <AlertDialogTitle>আপনি কি নিশ্চিত?</AlertDialogTitle>
+                        <AlertDialogTitle>{t('settings.danger_zone.confirm.title')}</AlertDialogTitle>
                         <AlertDialogDescription>
-                            এই ক্রিয়াটি ফিরিয়ে আনা যাবে না। এটি আপনার সমস্ত ডেটা স্থায়ীভাবে মুছে ফেলবে এবং আপনাকে আবার অনবোর্ডিং পৃষ্ঠা থেকে শুরু করতে হবে।
+                            {t('settings.danger_zone.confirm.description')}
                         </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                        <AlertDialogCancel>বাতিল করুন</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleClearData}>চালিয়ে যান</AlertDialogAction>
+                        <AlertDialogCancel>{t('settings.danger_zone.confirm.cancel')}</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleClearData}>{t('settings.danger_zone.confirm.continue')}</AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>

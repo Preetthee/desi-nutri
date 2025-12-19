@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { HeartPulse, TrendingUp, TrendingDown, ArrowRight, Lightbulb } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { startOfToday, startOfYesterday, isSameDay } from 'date-fns';
+import { useTranslation } from '@/contexts/language-provider';
 
 export default function Home() {
   const [profile] = useLocalStorage<UserProfile | null>('userProfile', null);
@@ -17,6 +18,7 @@ export default function Home() {
   const [isLoadingTip, setIsLoadingTip] = useState(true);
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
+  const { t, locale } = useTranslation();
 
   useEffect(() => {
     setIsClient(true);
@@ -38,8 +40,8 @@ export default function Home() {
         } catch (error) {
           console.error("Failed to fetch health tip:", error);
           setHealthTip({
-            suggestion: "প্রচুর পানি পান করে হাইড্রেটেড থাকুন।",
-            explanation: "সঠিক হাইড্রেশন সার্বিক স্বাস্থ্যের জন্য অপরিহার্য এবং ওজন নিয়ন্ত্রণে সহায়তা করতে পারে।"
+            suggestion: t('home.health_tip.fallback.suggestion'),
+            explanation: t('home.health_tip.fallback.explanation'),
           });
         } finally {
           setIsLoadingTip(false);
@@ -47,7 +49,7 @@ export default function Home() {
       };
       fetchHealthTip();
     }
-  }, [isClient, profile]);
+  }, [isClient, profile, t]);
 
   const { todayCalories, trendPercentage } = useMemo(() => {
     if (!isClient) return { todayCalories: 0, trendPercentage: 0 };
@@ -84,32 +86,34 @@ export default function Home() {
     );
   }
 
+  const numberLocale = locale === 'bn' ? 'bn-BD' : 'en-US';
+
   return (
     <div className="flex flex-col flex-1">
       <main className="flex-1 p-4 md:p-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold font-headline tracking-tight">
-            আবারও স্বাগতম, {profile.name}!
+            {t('home.welcome', { name: profile.name })}
           </h1>
           <p className="text-muted-foreground">
-            এখানে আপনার দৈনিক স্বাস্থ্যের একটি চিত্র।
+            {t('home.subtitle')}
           </p>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
           <Card>
             <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">আজকের ক্যালোরি গ্রহণ</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('home.today_calories')}</CardTitle>
               <HeartPulse className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{todayCalories.toLocaleString('bn-BD')}</div>
-              <p className="text-xs text-muted-foreground">আজ মোট ক্যালোরি গ্রহণ করা হয়েছে</p>
+              <div className="text-2xl font-bold">{todayCalories.toLocaleString(numberLocale)}</div>
+              <p className="text-xs text-muted-foreground">{t('home.today_calories.description')}</p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">দৈনিক প্রবণতা</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('home.daily_trend')}</CardTitle>
               <TrendIcon className={`h-4 w-4 ${trendColor}`} />
             </CardHeader>
             <CardContent>
@@ -117,7 +121,7 @@ export default function Home() {
                 {trendPercentage !== 0 && (trendPercentage > 0 ? '+' : '')}
                 {trendPercentage.toFixed(1)}%
               </div>
-              <p className="text-xs text-muted-foreground">গতকালের তুলনায়</p>
+              <p className="text-xs text-muted-foreground">{t('home.daily_trend.description')}</p>
             </CardContent>
           </Card>
         </div>
@@ -126,7 +130,7 @@ export default function Home() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Lightbulb className="text-primary" />
-              আপনার দৈনিক স্বাস্থ্য টিপ
+              {t('home.health_tip')}
             </CardTitle>
           </CardHeader>
           <CardContent>

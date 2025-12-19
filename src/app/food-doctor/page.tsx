@@ -17,10 +17,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-
-const formSchema = z.object({
-  foodName: z.string().min(2, 'অনুগ্রহ করে একটি খাবারের নাম লিখুন।'),
-});
+import { useTranslation } from '@/contexts/language-provider';
 
 export default function FoodDoctorPage() {
   const [suggestions, setSuggestions] = useLocalStorage<FoodSuggestions | null>('foodSuggestions', null);
@@ -30,6 +27,11 @@ export default function FoodDoctorPage() {
   const [foodCheckResult, setFoodCheckResult] = useState<CheckFoodAppropriatenessOutput | null>(null);
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
+  const { t } = useTranslation();
+
+  const formSchema = z.object({
+    foodName: z.string().min(2, t('food_doctor.check_food.placeholder')),
+  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -38,16 +40,16 @@ export default function FoodDoctorPage() {
 
   useEffect(() => {
     setIsClient(true);
-    if (!suggestions) {
+    if (!suggestions && profile) { // Only fetch if no suggestions and profile exists
       handleGenerateSuggestions();
     }
-  }, []);
+  }, [profile]); // Depend on profile
 
   const handleGenerateSuggestions = () => {
     if (!profile) {
       toast({
-        title: 'ত্রুটি',
-        description: 'ব্যবহারকারীর প্রোফাইল পাওয়া যায়নি। অনুগ্রহ করে অনবোর্ডিং সম্পূর্ণ করুন।',
+        title: t('general.error'),
+        description: t('food_doctor.check_food.no_profile'),
         variant: 'destructive',
       });
       return;
@@ -60,8 +62,8 @@ export default function FoodDoctorPage() {
       } catch (error) {
         console.error(error);
         toast({
-          title: 'AI ত্রুটি',
-          description: 'খাদ্য পরামর্শ তৈরি করতে ব্যর্থ। অনুগ্রহ করে আবার চেষ্টা করুন।',
+          title: t('general.ai_error'),
+          description: t('general.ai_error.description'),
           variant: 'destructive',
         });
       }
@@ -71,8 +73,8 @@ export default function FoodDoctorPage() {
   const onFoodCheckSubmit = (values: z.infer<typeof formSchema>) => {
     if (!profile) {
       toast({
-        title: 'ত্রুটি',
-        description: 'প্রথমে আপনার প্রোফাইল সেট আপ করুন।',
+        title: t('general.error'),
+        description: t('food_doctor.check_food.no_profile'),
         variant: 'destructive',
       });
       return;
@@ -88,8 +90,8 @@ export default function FoodDoctorPage() {
       } catch (error) {
         console.error('Error checking food:', error);
         toast({
-          title: 'AI ত্রুটি',
-          description: 'খাবারটি পরীক্ষা করতে ব্যর্থ। অনুগ্রহ করে আবার চেষ্টা করুন।',
+          title: t('general.ai_error'),
+          description: t('general.ai_error.description'),
           variant: 'destructive',
         });
       }
@@ -133,7 +135,7 @@ export default function FoodDoctorPage() {
           </CardHeader>
           <CardContent className="space-y-2">
             {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-4 w-full" />)}
-          </CardContent>
+          </auditing-tool>
         </Card>
       </div>
     </div>
@@ -143,21 +145,19 @@ export default function FoodDoctorPage() {
     <main className="flex-1 p-4 md:p-8">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold font-headline tracking-tight">ফুড ডক্টর</h1>
-          <p className="text-muted-foreground">আপনার ব্যক্তিগত AI-চালিত পুষ্টি নির্দেশিকা।</p>
+          <h1 className="text-3xl font-bold font-headline tracking-tight">{t('food_doctor.title')}</h1>
+          <p className="text-muted-foreground">{t('food_doctor.description')}</p>
         </div>
         <Button onClick={() => { setSuggestions(null); handleGenerateSuggestions(); }} disabled={isPending}>
           <RefreshCw className={`mr-2 h-4 w-4 ${isPending ? 'animate-spin' : ''}`} />
-          পুনরায় তৈরি করুন
+          {t('food_doctor.regenerate')}
         </Button>
       </div>
 
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle>কোনো খাবার পরীক্ষা করুন</CardTitle>
-          <CardDescription>
-            কোনো নির্দিষ্ট খাবার আপনার জন্য উপযুক্ত কি না তা জানতে এখানে তার নাম লিখুন।
-          </CardDescription>
+          <CardTitle>{t('food_doctor.check_food.title')}</CardTitle>
+          <CardDescription>{t('food_doctor.check_food.description')}</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -168,7 +168,7 @@ export default function FoodDoctorPage() {
                 render={({ field }) => (
                   <FormItem className="flex-1">
                     <FormControl>
-                      <Input placeholder="উদাহরণ: আম" {...field} />
+                      <Input placeholder={t('food_doctor.check_food.placeholder')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -176,7 +176,7 @@ export default function FoodDoctorPage() {
               />
               <Button type="submit" disabled={isCheckingFood}>
                 <Bot className={`mr-2 h-4 w-4 ${isCheckingFood ? 'animate-pulse' : ''}`} />
-                {isCheckingFood ? 'পরীক্ষা চলছে...' : 'পরীক্ষা করুন'}
+                {isCheckingFood ? t('food_doctor.check_food.checking') : t('food_doctor.check_food.button')}
               </Button>
             </form>
           </Form>
@@ -194,7 +194,7 @@ export default function FoodDoctorPage() {
               ) : (
                 <XCircle className="h-4 w-4" />
               )}
-              <AlertTitle>{foodCheckResult.isAllowed ? 'খেতে পারেন' : 'খাওয়া উচিত নয়'}</AlertTitle>
+              <AlertTitle>{foodCheckResult.isAllowed ? t('food_doctor.check_food.result.allowed') : t('food_doctor.check_food.result.not_allowed')}</AlertTitle>
               <AlertDescription>
                 <p className="font-semibold">{foodCheckResult.recommendation}</p>
                 <p className="text-xs">{foodCheckResult.reason}</p>
@@ -204,7 +204,7 @@ export default function FoodDoctorPage() {
         </CardContent>
       </Card>
 
-      {isPending && (!suggestions || isClient) ? (
+      {isPending && (!suggestions || !isClient) ? (
         renderSkeleton()
       ) : suggestions ? (
         <div className="space-y-8 animate-in fade-in-50">
@@ -212,25 +212,25 @@ export default function FoodDoctorPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Utensils className="text-primary" />
-                দৈনিক আহার পরিকল্পনা
+                {t('food_doctor.meal_plan.title')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="space-y-1">
-                  <h3 className="font-semibold">সকালের নাস্তা</h3>
+                  <h3 className="font-semibold">{t('food_doctor.meal_plan.breakfast')}</h3>
                   <p className="text-muted-foreground">{suggestions.daily_meal_plan.breakfast}</p>
                 </div>
                 <div className="space-y-1">
-                  <h3 className="font-semibold">দুপুরের খাবার</h3>
+                  <h3 className="font-semibold">{t('food_doctor.meal_plan.lunch')}</h3>
                   <p className="text-muted-foreground">{suggestions.daily_meal_plan.lunch}</p>
                 </div>
                 <div className="space-y-1">
-                  <h3 className="font-semibold">রাতের খাবার</h3>
+                  <h3 className="font-semibold">{t('food_doctor.meal_plan.dinner')}</h3>
                   <p className="text-muted-foreground">{suggestions.daily_meal_plan.dinner}</p>
                 </div>
                 <div className="space-y-1">
-                  <h3 className="font-semibold">হালকা খাবার</h3>
+                  <h3 className="font-semibold">{t('food_doctor.meal_plan.snacks')}</h3>
                   <p className="text-muted-foreground">{suggestions.daily_meal_plan.snacks}</p>
                 </div>
               </div>
@@ -242,7 +242,7 @@ export default function FoodDoctorPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-green-600">
                   <Leaf />
-                  প্রস্তাবিত খাবার
+                  {t('food_doctor.recommended_foods.title')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -255,7 +255,7 @@ export default function FoodDoctorPage() {
                <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-blue-600">
                   <Wallet />
-                  বাজেট-বান্ধব খাবার
+                  {t('food_doctor.budget_friendly_foods.title')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -268,7 +268,7 @@ export default function FoodDoctorPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-red-600">
                   <Siren />
-                  যেসব খাবার এড়িয়ে চলতে হবে
+                  {t('food_doctor.foods_to_avoid.title')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -282,7 +282,7 @@ export default function FoodDoctorPage() {
       ) : (
         isClient && (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">আপনার ব্যক্তিগতকৃত খাদ্য পরিকল্পনা পেতে "পুনরায় তৈরি করুন" ক্লিক করুন।</p>
+            <p className="text-muted-foreground">{t('food_doctor.no_suggestions')}</p>
           </div>
         )
       )}

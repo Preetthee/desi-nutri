@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
 import { AppSidebar } from '@/components/app-sidebar';
 import { SidebarProvider } from '@/components/ui/sidebar';
+import { LanguageProvider } from '@/contexts/language-provider';
 
 export const metadata: Metadata = {
   title: 'দেশি নিউট্রি',
@@ -30,12 +31,14 @@ export default function RootLayout({
         />
       </head>
       <body className={cn('font-body antialiased')}>
-        <SidebarProvider>
-          <div className="relative flex h-screen w-full flex-col md:flex-row">
-            <AppSidebar />
-            <main className="flex-1 overflow-y-auto pb-16 md:pb-0">{children}</main>
-          </div>
-        </SidebarProvider>
+        <LanguageProvider>
+          <SidebarProvider>
+            <div className="relative flex h-screen w-full flex-col md:flex-row">
+              <AppSidebar />
+              <main className="flex-1 overflow-y-auto pb-16 md:pb-0">{children}</main>
+            </div>
+          </SidebarProvider>
+        </LanguageProvider>
         <Toaster />
       </body>
     </html>

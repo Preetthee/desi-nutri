@@ -20,20 +20,20 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Logo } from '@/components/logo';
-
-const formSchema = z.object({
-  name: z.string().min(2, {
-    message: 'নাম কমপক্ষে ২ অক্ষরের হতে হবে।',
-  }),
-  age: z.coerce.number().min(1, 'বয়স আবশ্যক।'),
-  height: z.coerce.number().min(1, 'উচ্চতা (সেমি) আবশ্যক।'),
-  weight: z.coerce.number().min(1, 'ওজন (কেজি) আবশ্যক।'),
-  health_info: z.string().min(10, 'অনুগ্রহ করে কিছু স্বাস্থ্য সম্পর্কিত তথ্য দিন।'),
-});
+import { useTranslation } from '@/contexts/language-provider';
 
 export default function OnboardingPage() {
   const [, setProfile] = useLocalStorage<UserProfile | null>('userProfile', null);
   const router = useRouter();
+  const { t } = useTranslation();
+
+  const formSchema = z.object({
+    name: z.string().min(2, t('onboarding.name.error')),
+    age: z.coerce.number().min(1, t('onboarding.age.error')),
+    height: z.coerce.number().min(1, t('onboarding.height.error')),
+    weight: z.coerce.number().min(1, t('onboarding.weight.error')),
+    health_info: z.string().min(10, t('onboarding.health_info.error')),
+  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -56,8 +56,8 @@ export default function OnboardingPage() {
       <Card className="w-full max-w-lg">
         <CardHeader className="items-center text-center">
             <Logo className="mb-2"/>
-          <CardTitle className="text-2xl font-headline">দেশি নিউট্রিতে স্বাগতম</CardTitle>
-          <CardDescription>আপনার অভিজ্ঞতা ব্যক্তিগতকৃত করতে আপনার সম্পর্কে কিছু তথ্য দিন।</CardDescription>
+          <CardTitle className="text-2xl font-headline">{t('onboarding.welcome')}</CardTitle>
+          <CardDescription>{t('onboarding.description')}</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -67,9 +67,9 @@ export default function OnboardingPage() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>নাম</FormLabel>
+                    <FormLabel>{t('onboarding.name')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="উদাহরণ: জন ডো" {...field} />
+                      <Input placeholder={t('onboarding.name.placeholder')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -81,9 +81,9 @@ export default function OnboardingPage() {
                   name="age"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>বয়স</FormLabel>
+                      <FormLabel>{t('onboarding.age')}</FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="উদাহরণ: ৩০" {...field} onChange={e => field.onChange(e.target.valueAsNumber)} />
+                        <Input type="number" placeholder={t('onboarding.age.placeholder')} {...field} onChange={e => field.onChange(e.target.valueAsNumber || 0)} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -94,9 +94,9 @@ export default function OnboardingPage() {
                   name="height"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>উচ্চতা (সেমি)</FormLabel>
+                      <FormLabel>{t('onboarding.height')}</FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="উদাহরণ: ১৭০" {...field} onChange={e => field.onChange(e.target.valueAsNumber)} />
+                        <Input type="number" placeholder={t('onboarding.height.placeholder')} {...field} onChange={e => field.onChange(e.target.valueAsNumber || 0)} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -107,9 +107,9 @@ export default function OnboardingPage() {
                   name="weight"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>ওজন (কেজি)</FormLabel>
+                      <FormLabel>{t('onboarding.weight')}</FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="উদাহরণ: ৬৫" {...field} onChange={e => field.onChange(e.target.valueAsNumber)} />
+                        <Input type="number" placeholder={t('onboarding.weight.placeholder')} {...field} onChange={e => field.onChange(e.target.valueAsNumber || 0)} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -121,21 +121,21 @@ export default function OnboardingPage() {
                 name="health_info"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>স্বাস্থ্য সম্পর্কিত তথ্য ও লক্ষ্য</FormLabel>
+                    <FormLabel>{t('onboarding.health_info')}</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="উদাহরণ: ওজন কমাতে চাই, নিরামিষাশী।"
+                        placeholder={t('onboarding.health_info.placeholder')}
                         {...field}
                       />
                     </FormControl>
                     <FormDescription>
-                      এটি আমাদের আপনাকে আরও ভালো পরামর্শ দিতে সাহায্য করবে।
+                      {t('onboarding.health_info.description')}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full">শুরু করুন</Button>
+              <Button type="submit" className="w-full">{t('onboarding.submit')}</Button>
             </form>
           </Form>
         </CardContent>
