@@ -1,20 +1,31 @@
 'use client';
 
 import { useTranslation } from '@/contexts/language-provider';
-import { Button } from '@/components/ui/button';
-import { Globe } from 'lucide-react';
+import type { Locale } from '@/lib/i18n';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 export function LanguageToggle() {
   const { locale, setLocale } = useTranslation();
 
-  const toggleLanguage = () => {
-    setLocale(locale === 'en' ? 'bn' : 'en');
+  const handleLanguageChange = (value: string) => {
+    setLocale(value as Locale);
   };
 
   return (
-    <Button variant="ghost" size="icon" onClick={toggleLanguage} aria-label="Toggle language">
-      <Globe className="h-5 w-5" />
-      <span className="sr-only">Toggle Language</span>
-    </Button>
+    <Select value={locale} onValueChange={handleLanguageChange}>
+      <SelectTrigger className="w-[120px]">
+        <SelectValue placeholder="Language" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="bn">বাংলা</SelectItem>
+        <SelectItem value="en">English</SelectItem>
+      </SelectContent>
+    </Select>
   );
 }

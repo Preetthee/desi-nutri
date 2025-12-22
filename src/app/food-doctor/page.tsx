@@ -26,7 +26,7 @@ export default function FoodDoctorPage() {
   const [foodCheckResult, setFoodCheckResult] = useState<CheckFoodAppropriatenessOutput | null>(null);
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
 
   const formSchema = z.object({
     foodName: z.string().min(2, t('food_doctor.check_food.placeholder')),
@@ -196,8 +196,8 @@ export default function FoodDoctorPage() {
               )}
               <AlertTitle>{foodCheckResult.isAllowed ? t('food_doctor.check_food.result.allowed') : t('food_doctor.check_food.result.not_allowed')}</AlertTitle>
               <AlertDescription>
-                <p className="font-semibold">{foodCheckResult.recommendation}</p>
-                <p className="text-xs">{foodCheckResult.reason}</p>
+                <p className="font-semibold">{foodCheckResult.recommendation[locale]}</p>
+                <p className="text-xs">{foodCheckResult.reason[locale]}</p>
               </AlertDescription>
             </Alert>
           )}
@@ -219,19 +219,19 @@ export default function FoodDoctorPage() {
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="space-y-1">
                   <h3 className="font-semibold">{t('food_doctor.meal_plan.breakfast')}</h3>
-                  <p className="text-muted-foreground">{suggestions.daily_meal_plan.breakfast}</p>
+                  <p className="text-muted-foreground">{suggestions.daily_meal_plan.breakfast[locale]}</p>
                 </div>
                 <div className="space-y-1">
                   <h3 className="font-semibold">{t('food_doctor.meal_plan.lunch')}</h3>
-                  <p className="text-muted-foreground">{suggestions.daily_meal_plan.lunch}</p>
+                  <p className="text-muted-foreground">{suggestions.daily_meal_plan.lunch[locale]}</p>
                 </div>
                 <div className="space-y-1">
                   <h3 className="font-semibold">{t('food_doctor.meal_plan.dinner')}</h3>
-                  <p className="text-muted-foreground">{suggestions.daily_meal_plan.dinner}</p>
+                  <p className="text-muted-foreground">{suggestions.daily_meal_plan.dinner[locale]}</p>
                 </div>
                 <div className="space-y-1">
                   <h3 className="font-semibold">{t('food_doctor.meal_plan.snacks')}</h3>
-                  <p className="text-muted-foreground">{suggestions.daily_meal_plan.snacks}</p>
+                  <p className="text-muted-foreground">{suggestions.daily_meal_plan.snacks[locale]}</p>
                 </div>
               </div>
             </CardContent>
@@ -247,7 +247,7 @@ export default function FoodDoctorPage() {
               </CardHeader>
               <CardContent>
                 <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                  {suggestions.recommended_foods?.map((food, i) => <li key={i}>{food}</li>)}
+                  {suggestions.recommended_foods?.map((food, i) => <li key={i}>{food[locale]}</li>)}
                 </ul>
               </CardContent>
             </Card>
@@ -260,7 +260,7 @@ export default function FoodDoctorPage() {
               </CardHeader>
               <CardContent>
                 <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                  {suggestions.budget_friendly_foods?.map((food, i) => <li key={i}>{food}</li>)}
+                  {suggestions.budget_friendly_foods?.map((food, i) => <li key={i}>{food[locale]}</li>)}
                 </ul>
               </CardContent>
             </Card>
@@ -273,7 +273,7 @@ export default function FoodDoctorPage() {
               </CardHeader>
               <CardContent>
                 <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                  {suggestions.foods_to_avoid?.map((food, i) => <li key={i}>{food}</li>)}
+                  {suggestions.foods_to_avoid?.map((food, i) => <li key={i}>{food[locale]}</li>)}
                 </ul>
               </CardContent>
             </Card>

@@ -9,6 +9,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import { LocalizedTextSchema } from '@/lib/types';
 
 const FoodSuggestionsInputSchema = z.object({
   name: z.string().describe('The name of the user.'),
@@ -20,15 +21,15 @@ const FoodSuggestionsInputSchema = z.object({
 export type FoodSuggestionsInput = z.infer<typeof FoodSuggestionsInputSchema>;
 
 const FoodSuggestionsOutputSchema = z.object({
-  recommended_foods: z.array(z.string()).describe('A list of recommended foods for the user, in Bengali.'),
-  budget_friendly_foods: z.array(z.string()).describe('A list of budget-friendly recommended foods for the user, in Bengali.'),
-  foods_to_avoid: z.array(z.string()).describe('A list of foods the user should avoid, in Bengali.'),
+  recommended_foods: z.array(LocalizedTextSchema).describe('A list of recommended foods for the user, in both Bengali and English.'),
+  budget_friendly_foods: z.array(LocalizedTextSchema).describe('A list of budget-friendly recommended foods for the user, in both Bengali and English.'),
+  foods_to_avoid: z.array(LocalizedTextSchema).describe('A list of foods the user should avoid, in both Bengali and English.'),
   daily_meal_plan: z.object({
-    breakfast: z.string().describe('Suggested breakfast for the user, in Bengali.'),
-    lunch: z.string().describe('Suggested lunch for the user, in Bengali.'),
-    dinner: z.string().describe('Suggested dinner for the user, in Bengali.'),
-    snacks: z.string().describe('Suggested snacks for the user, in Bengali.'),
-  }).describe('A full one-day meal plan for the user, in Bengali.'),
+    breakfast: LocalizedTextSchema.describe('Suggested breakfast for the user, in both Bengali and English.'),
+    lunch: LocalizedTextSchema.describe('Suggested lunch for the user, in both Bengali and English.'),
+    dinner: LocalizedTextSchema.describe('Suggested dinner for the user, in both Bengali and English.'),
+    snacks: LocalizedTextSchema.describe('Suggested snacks for the user, in both Bengali and English.'),
+  }).describe('A full one-day meal plan for the user, in both Bengali and English.'),
 });
 export type FoodSuggestionsOutput = z.infer<typeof FoodSuggestionsOutputSchema>;
 
@@ -41,17 +42,27 @@ const foodSuggestionsPrompt = ai.definePrompt({
   input: {schema: FoodSuggestionsInputSchema},
   output: {schema: FoodSuggestionsOutputSchema},
   prompt: `You are a food and nutrition expert. Based on user info below, suggest a food guide.
-The entire response must be in Bengali.
+The entire response must be in both Bengali and English.
 User info: Name={{name}}, Age={{age}}, Height={{height}}, Weight={{weight}}, Health={{health_info}}
-Return JSON:
+Return JSON in this exact format:
 {
- "recommended_foods":["",""],
- "budget_friendly_foods":["",""],
- "foods_to_avoid":["",""],
- "daily_meal_plan":{
-    "breakfast":"..","lunch":"..","dinner":"..","snacks":".."
- }
-}`,
+  "recommended_foods": [
+    {"bn": "...", "en": "..."}
+  ],
+  "budget_friendly_foods": [
+    {"bn": "...", "en": "..."}
+  ],
+  "foods_to_avoid": [
+    {"bn": "...", "en": "..."}
+  ],
+  "daily_meal_plan": {
+    "breakfast": {"bn": "...", "en": "..."},
+    "lunch": {"bn": "...", "en": "..."},
+    "dinner": {"bn": "...", "en": "..."},
+    "snacks": {"bn": "...", "en": "..."}
+  }
+}
+`,
 });
 
 const foodSuggestionsFlow = ai.defineFlow(

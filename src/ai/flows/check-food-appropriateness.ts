@@ -9,6 +9,7 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
+import { LocalizedTextSchema } from '@/lib/types';
 
 const UserProfileSchema = z.object({
   name: z.string(),
@@ -26,8 +27,8 @@ export type CheckFoodAppropriatenessInput = z.infer<typeof CheckFoodAppropriaten
 
 const CheckFoodAppropriatenessOutputSchema = z.object({
   isAllowed: z.boolean().describe('Whether the user is allowed to eat the food.'),
-  recommendation: z.string().describe('A detailed recommendation about the food, including portion size if allowed, in Bengali.'),
-  reason: z.string().describe('The reason for the recommendation, in Bengali.'),
+  recommendation: LocalizedTextSchema.describe('A detailed recommendation about the food, including portion size if allowed, in both Bengali and English.'),
+  reason: LocalizedTextSchema.describe('The reason for the recommendation, in both Bengali and English.'),
 });
 export type CheckFoodAppropriatenessOutput = z.infer<typeof CheckFoodAppropriatenessOutputSchema>;
 
@@ -44,7 +45,7 @@ const checkFoodFlow = ai.defineFlow(
       input: { schema: CheckFoodAppropriatenessInputSchema },
       output: { schema: CheckFoodAppropriatenessOutputSchema },
       prompt: `You are an expert nutritionist. A user wants to know if they can eat a specific food based on their health profile.
-The entire response must be in Bengali.
+Provide the entire response in both Bengali and English.
 
 User Profile:
 - Name: {{profile.name}}
@@ -56,22 +57,34 @@ User Profile:
 Food to check: "{{foodName}}"
 
 Based on the user's profile, determine if they should eat this food.
-- If it's allowed, set isAllowed to true and provide a recommendation including a suggested portion size.
-- If it's not allowed, set isAllowed to false and explain why it should be avoided.
-- The reason should briefly explain your decision based on their health data.
+- If it's allowed, set isAllowed to true.
+- If it's not allowed, set isAllowed to false.
+- Provide a recommendation (including portion size if allowed) and a reason for the decision in both English and Bengali.
 
 Example for a diabetic user asking about "Mango":
 {
   "isAllowed": true,
-  "recommendation": "হ্যাঁ, আপনি আম খেতে পারেন, তবে পরিমিত পরিমাণে। একবারে অর্ধেক আমের বেশি খাবেন না।",
-  "reason": "আমে প্রাকৃতিক চিনি থাকে যা রক্তে শর্করার মাত্রা বাড়াতে পারে, তাই পরিমাণ সীমিত রাখা জরুরি।"
+  "recommendation": {
+    "bn": "হ্যাঁ, আপনি আম খেতে পারেন, তবে পরিমিত পরিমাণে। একবারে অর্ধেক আমের বেশি খাবেন না।",
+    "en": "Yes, you can eat mango, but in moderation. Do not eat more than half a mango at a time."
+  },
+  "reason": {
+    "bn": "আমে প্রাকৃতিক চিনি থাকে যা রক্তে শর্করার মাত্রা বাড়াতে পারে, তাই পরিমাণ সীমিত রাখা জরুরি।",
+    "en": "Mango contains natural sugar that can raise blood sugar levels, so it's important to limit the amount."
+  }
 }
 
 Example for a user with gluten allergy asking about "Roti":
 {
   "isAllowed": false,
-  "recommendation": "না, আপনার রুটি খাওয়া উচিত নয় কারণ এটি গমের তৈরি।",
-  "reason": "আপনার গ্লুটেন অ্যালার্জি আছে এবং গমের রুটিতে গ্লুটেন থাকে, যা আপনার জন্য ক্ষতিকর হতে পারে।"
+  "recommendation": {
+    "bn": "না, আপনার রুটি খাওয়া উচিত নয় কারণ এটি গমের তৈরি।",
+    "en": "No, you should not eat roti because it is made of wheat."
+  },
+  "reason": {
+    "bn": "আপনার গ্লুটেন অ্যালার্জি আছে এবং গমের রুটিতে গ্লুটেন থাকে, যা আপনার জন্য ক্ষতিকর হতে পারে।",
+    "en": "You have a gluten allergy, and wheat roti contains gluten, which can be harmful to you."
+  }
 }
 `,
     });

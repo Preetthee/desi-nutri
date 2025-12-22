@@ -3,8 +3,8 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocalStorage } from '@/hooks/use-local-storage';
-import type { UserProfile, CalorieLog } from '@/lib/types';
-import { generateHealthTip, type GenerateHealthTipOutput } from '@/ai/flows/generate-health-tip';
+import type { UserProfile, CalorieLog, LocalizedHealthTip, HealthTip } from '@/lib/types';
+import { generateHealthTip } from '@/ai/flows/generate-health-tip';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { HeartPulse, TrendingUp, TrendingDown, ArrowRight, Lightbulb } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -14,7 +14,7 @@ import { useTranslation } from '@/contexts/language-provider';
 export default function Home() {
   const [profile] = useLocalStorage<UserProfile | null>('userProfile', null);
   const [logs] = useLocalStorage<CalorieLog[]>('calorieLogs', []);
-  const [healthTip, setHealthTip] = useState<GenerateHealthTipOutput | null>(null);
+  const [healthTip, setHealthTip] = useLocalStorage<LocalizedHealthTip | null>('healthTip', null);
   const [isLoadingTip, setIsLoadingTip] = useState(true);
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
@@ -31,7 +31,7 @@ export default function Home() {
   }, [isClient, profile, router]);
 
   useEffect(() => {
-    if (isClient && profile) {
+    if (isClient && profile && !healthTip) {
       const fetchHealthTip = async () => {
         setIsLoadingTip(true);
         try {
@@ -39,17 +39,17 @@ export default function Home() {
           setHealthTip(tip);
         } catch (error) {
           console.error("Failed to fetch health tip:", error);
-          setHealthTip({
-            suggestion: t('home.health_tip.fallback.suggestion'),
-            explanation: t('home.health_tip.fallback.explanation'),
-          });
+          // Fallback is handled by checking healthTip value in render
         } finally {
           setIsLoadingTip(false);
         }
       };
       fetchHealthTip();
+    } else if (healthTip) {
+      setIsLoadingTip(false);
     }
-  }, [isClient, profile, t]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isClient, profile]);
 
   const { todayCalories, trendPercentage } = useMemo(() => {
     if (!isClient) return { todayCalories: 0, trendPercentage: 0 };
@@ -58,11 +58,23 @@ export default function Home() {
     const yesterday = startOfYesterday();
 
     const todayCalories = logs
-      .filter(log => isSameDay(new Date(log.date), today))
+      .filter(log => {
+        try {
+          return isSameDay(new Date(log.date), today)
+        } catch(e) {
+          return false;
+        }
+      })
       .reduce((sum, log) => sum + log.total_calories, 0);
 
     const yesterdayCalories = logs
-      .filter(log => isSameDay(new Date(log.date), yesterday))
+      .filter(log => {
+         try {
+          return isSameDay(new Date(log.date), yesterday)
+        } catch(e) {
+          return false;
+        }
+      })
       .reduce((sum, log) => sum + log.total_calories, 0);
 
     let trendPercentage = 0;
@@ -87,6 +99,11 @@ export default function Home() {
   }
 
   const numberLocale = locale === 'bn' ? 'bn-BD' : 'en-US';
+
+  const displayedHealthTip: HealthTip = healthTip ? healthTip[locale] : {
+      suggestion: t('home.health_tip.fallback.suggestion'),
+      explanation: t('home.health_tip.fallback.explanation'),
+  };
 
   return (
     <div className="flex flex-col flex-1">
@@ -140,12 +157,10 @@ export default function Home() {
                 <Skeleton className="h-4 w-full" />
               </div>
             ) : (
-              healthTip && (
                 <>
-                  <p className="font-semibold text-lg">"{healthTip.suggestion}"</p>
-                  <p className="text-muted-foreground mt-2">{healthTip.explanation}</p>
+                  <p className="font-semibold text-lg">"{displayedHealthTip.suggestion}"</p>
+                  <p className="text-muted-foreground mt-2">{displayedHealthTip.explanation}</p>
                 </>
-              )
             )}
           </CardContent>
         </Card>

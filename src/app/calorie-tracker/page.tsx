@@ -118,11 +118,13 @@ export default function CalorieTrackerPage() {
                 <p className="text-center text-muted-foreground py-4">{t('calorie_tracker.recent_logs.empty')}</p>
             ) : (
             <Accordion type="single" collapsible className="w-full">
-              {sortedLogs.map((log) => (
+              {sortedLogs.map((log) => {
+                const foodSummary = log.items.map(item => item.name[locale]).join(', ');
+                return (
                 <AccordionItem value={log.id} key={log.id}>
                   <AccordionTrigger>
                     <div className="flex justify-between w-full pr-4">
-                      <span className="font-medium max-w-xs truncate text-left">{log.food_text}</span>
+                      <span className="font-medium max-w-xs truncate text-left">{foodSummary}</span>
                       <div className="flex items-center gap-4">
                         <span className="font-semibold">{log.total_calories.toLocaleString(numberLocale)} {t('general.calories')}</span>
                         <span className="text-muted-foreground text-xs hidden sm:block">{format(new Date(log.date), 'MMM d, h:mm a', { locale: dateLocale })}</span>
@@ -140,7 +142,7 @@ export default function CalorieTrackerPage() {
                       <TableBody>
                         {log.items.map((item, index) => (
                           <TableRow key={index}>
-                            <TableCell>{item.name}</TableCell>
+                            <TableCell>{item.name[locale]}</TableCell>
                             <TableCell className="text-right">{item.calories.toLocaleString(numberLocale)}</TableCell>
                           </TableRow>
                         ))}
@@ -148,7 +150,8 @@ export default function CalorieTrackerPage() {
                     </Table>
                   </AccordionContent>
                 </AccordionItem>
-              ))}
+                )
+              })}
             </Accordion>
              )}
           </CardContent>

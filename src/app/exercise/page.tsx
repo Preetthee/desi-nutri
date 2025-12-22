@@ -7,7 +7,7 @@ import { generateExerciseSuggestion } from '@/ai/flows/generate-exercise-suggest
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Dumbbell, RefreshCw, AlertTriangle, Check, Award } from 'lucide-react';
+import { Dumbbell, RefreshCw, AlertTriangle, Award } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useTranslation } from '@/contexts/language-provider';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -87,15 +87,15 @@ export default function ExercisePage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile, isClient]);
 
-  const handleCheckChange = (exercise: string, checked: boolean | string) => {
+  const handleCheckChange = (exerciseNameInEnglish: string, checked: boolean | string) => {
     if(checked) {
-        setChecklist(prev => [...prev, exercise]);
+        setChecklist(prev => [...prev, exerciseNameInEnglish]);
     } else {
-        setChecklist(prev => prev.filter(item => item !== exercise));
+        setChecklist(prev => prev.filter(item => item !== exerciseNameInEnglish));
     }
   };
   
-  const allTasksCompleted = suggestion && suggestion.exercises.every(ex => checklist.includes(ex.name));
+  const allTasksCompleted = suggestion && suggestion.exercises.every(ex => checklist.includes(ex.name.en));
 
   return (
     <main className="flex-1 p-4 md:p-8">
@@ -144,18 +144,18 @@ export default function ExercisePage() {
                     </div>
                 ) : suggestion ? (
                     <div className="space-y-4">
-                        <p className="text-muted-foreground">{suggestion.summary}</p>
+                        <p className="text-muted-foreground">{suggestion.summary[locale]}</p>
                         <div className="space-y-3">
                             <h3 className="font-semibold">{t('exercise.plan.checklist_title')}</h3>
                             {suggestion.exercises.map((ex, index) => (
                                 <div key={index} className="flex items-center space-x-3 p-3 bg-muted/50 rounded-md">
                                     <Checkbox 
                                       id={`ex-${index}`} 
-                                      checked={checklist.includes(ex.name)}
-                                      onCheckedChange={(checked) => handleCheckChange(ex.name, checked)}
+                                      checked={checklist.includes(ex.name.en)}
+                                      onCheckedChange={(checked) => handleCheckChange(ex.name.en, checked)}
                                     />
                                     <Label htmlFor={`ex-${index}`} className="flex-1 cursor-pointer">
-                                        <span className="font-medium">{ex.name}</span>
+                                        <span className="font-medium">{ex.name[locale]}</span>
                                         <span className="text-muted-foreground text-sm block">({ex.duration_minutes} {t('exercise.plan.minutes')})</span>
                                     </Label>
                                 </div>

@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 export type UserProfile = {
   name: string;
   age: number;
@@ -6,20 +8,26 @@ export type UserProfile = {
   health_info: string;
 };
 
+export const LocalizedTextSchema = z.object({
+  bn: z.string(),
+  en: z.string(),
+});
+export type LocalizedText = z.infer<typeof LocalizedTextSchema>;
+
 export type FoodSuggestions = {
-  recommended_foods: string[];
-  budget_friendly_foods: string[];
-  foods_to_avoid: string[];
+  recommended_foods: LocalizedText[];
+  budget_friendly_foods: LocalizedText[];
+  foods_to_avoid: LocalizedText[];
   daily_meal_plan: {
-    breakfast: string;
-    lunch: string;
-    dinner: string;
-    snacks: string;
+    breakfast: LocalizedText;
+    lunch: LocalizedText;
+    dinner: LocalizedText;
+    snacks: LocalizedText;
   };
 };
 
 export type CalorieLogItem = {
-  name: string;
+  name: LocalizedText;
   calories: number;
 };
 
@@ -32,11 +40,22 @@ export type CalorieLog = {
 };
 
 export type Exercise = {
-    name: string;
+    name: LocalizedText;
     duration_minutes: number;
 };
 
 export type ExerciseSuggestion = {
-    summary: string;
+    summary: LocalizedText;
     exercises: Exercise[];
+};
+
+
+export type HealthTip = {
+  suggestion: string;
+  explanation: string;
+};
+
+export type LocalizedHealthTip = {
+  bn: HealthTip;
+  en: HealthTip;
 };

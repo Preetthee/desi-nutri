@@ -16,33 +16,48 @@ const GenerateHealthTipInputSchema = z.object({
 });
 export type GenerateHealthTipInput = z.infer<typeof GenerateHealthTipInputSchema>;
 
+const TipSchema = z.object({
+    suggestion: z.string().describe('A short, actionable health suggestion or reminder for the user.'),
+    explanation: z.string().describe('A brief explanation of how the suggestion will help the user achieve their health goals.'),
+});
+
 const GenerateHealthTipOutputSchema = z.object({
-  suggestion: z.string().describe('A short, actionable health suggestion or reminder for the user, in Bengali.'),
-  explanation: z.string().describe('A brief explanation of how the suggestion will help the user achieve their health goals, in Bengali.'),
+  bn: TipSchema,
+  en: TipSchema,
 });
 export type GenerateHealthTipOutput = z.infer<typeof GenerateHealthTipOutputSchema>;
 
-export async function generateHealthTip(input: GenerateHealthTipInput): Promise<GenerateHealthTipOutput> {
-  return generateHealthTipFlow(input);
-}
-
-const prompt = ai.definePrompt({
-  name: 'generateHealthTipPrompt',
-  input: { schema: GenerateHealthTipInputSchema },
-  output: { schema: GenerateHealthTipOutputSchema },
-  prompt: `You are a friendly and encouraging health coach. Based on the user's health goals, provide a concise, actionable suggestion and a brief explanation of its benefits.
+const generateTipForLocale = async (input: GenerateHealthTipInput, locale: 'bn' | 'en'): Promise<z.infer<typeof TipSchema>> => {
+    const prompt = ai.definePrompt({
+        name: `generateHealthTipPrompt-${locale}`,
+        input: { schema: GenerateHealthTipInputSchema },
+        output: { schema: TipSchema },
+        prompt: `You are a friendly and encouraging health coach. Based on the user's health goals, provide a concise, actionable suggestion and a brief explanation of its benefits.
 The user's name is {{name}} and their goals are: "{{health_info}}".
 
-The entire response must be in Bengali.
+The entire response must be in ${locale === 'bn' ? 'Bengali' : 'English'}.
 
 Keep the suggestion to a single, impactful sentence. The explanation should also be a single sentence.
-Example Output for a user wanting to "lose weight":
+${
+  locale === 'bn'
+    ? `Example Output for a user wanting to "lose weight":
 {
   "suggestion": "আজ আপনার লাঞ্চ ব্রেকে ১৫ মিনিটের হাঁটার চেষ্টা করুন।",
   "explanation": "এটি আপনার মেটাবলিজম বাড়াতে এবং আপনার দৈনিক ক্যালোরি ঘাটতিতে অবদান রাখতে পারে।"
+}`
+    : `Example Output for a user wanting to "lose weight":
+{
+  "suggestion": "Try a 15-minute walk during your lunch break today.",
+  "explanation": "This can help boost your metabolism and contribute to your daily calorie deficit."
+}`
 }
 `,
-});
+    });
+
+    const { output } = await prompt(input);
+    return output!;
+};
+
 
 const generateHealthTipFlow = ai.defineFlow(
   {
@@ -51,7 +66,15 @@ const generateHealthTipFlow = ai.defineFlow(
     outputSchema: GenerateHealthTipOutputSchema,
   },
   async (input) => {
-    const { output } = await prompt(input);
-    return output!;
+    const [bn, en] = await Promise.all([
+        generateTipForLocale(input, 'bn'),
+        generateTipForLocale(input, 'en')
+    ]);
+    return { bn, en };
   }
 );
+
+
+export async function generateHealthTip(input: GenerateHealthTipInput): Promise<GenerateHealthTipOutput> {
+  return generateHealthTipFlow(input);
+}
