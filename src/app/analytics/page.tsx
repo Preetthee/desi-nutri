@@ -98,7 +98,7 @@ export default function AnalyticsPage() {
     
     const logsByDate = new Map<string, {calories: number; steps: number; water: number; workout: number; sleep: number; count: number }>();
 
-    [...calorieLogs, ...healthLogs].forEach(log => {
+    [...calorieLogs, ...(activeProfile?.healthLogs || [])].forEach(log => {
       try {
           const date = startOfDay(new Date(log.date));
           const key = format(date, 'yyyy-MM-dd');
@@ -187,23 +187,50 @@ export default function AnalyticsPage() {
         };
     });
 
-  }, [isClient, calorieLogs, healthLogs, dateLocale, viewMode]);
+  }, [isClient, calorieLogs, healthLogs, dateLocale, viewMode, activeProfile]);
 
-  const renderChart = (dataKey: string, name: string, color: string, type: 'line' | 'bar') => {
+  const chartConfig = {
+    calories: { label: t('general.calories'), color: 'hsl(var(--chart-1))' },
+    steps: { label: t('health_tracker.steps'), color: 'hsl(var(--chart-2))' },
+    sleep: { label: t('health_tracker.sleep'), color: 'hsl(var(--chart-3))' },
+    water: { label: t('health_tracker.water'), color: 'hsl(var(--chart-4))' },
+    workout: { label: t('health_tracker.workout'), color: 'hsl(var(--chart-5))' },
+  }
+
+  const renderChart = (dataKey: keyof typeof chartConfig, name: string, type: 'line' | 'bar') => {
     const ChartComponent = type === 'line' ? LineChart : BarChart;
     const ChartElement = type === 'line' ? Line : Bar;
+    const color = chartConfig[dataKey].color;
 
     return (
-      <ResponsiveContainer width="100%" height={300}>
-        <ChartComponent data={chartData}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip content={<ChartTooltipContent formatter={(value) => typeof value === 'number' ? value.toLocaleString(numberLocale) : value} />} />
-          <Legend />
-          <ChartElement type="monotone" dataKey={dataKey} name={name} stroke={color} fill={color} />
-        </ChartComponent>
-      </ResponsiveContainer>
+       <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
+         <ChartComponent data={chartData}>
+            <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="name"
+              tickLine={false}
+              tickMargin={10}
+              axisLine={false}
+            />
+            <YAxis />
+            <ChartTooltipContainer
+              cursor={false}
+              content={<ChartTooltipContent
+                formatter={(value, name) => {
+                  const itemConfig = chartConfig[name as keyof typeof chartConfig];
+                  return (
+                    <div className="flex flex-col">
+                      <span className="font-bold">{itemConfig.label}</span>
+                      <span>{typeof value === 'number' ? value.toLocaleString(numberLocale) : value}</span>
+                    </div>
+                  )
+                }}
+              />}
+            />
+            <Legend />
+            <ChartElement dataKey={dataKey} name={name} fill={color} stroke={color} radius={type === 'bar' ? 4 : undefined} />
+         </ChartComponent>
+       </ChartContainer>
     );
   };
   
@@ -235,8 +262,8 @@ export default function AnalyticsPage() {
           <CardHeader>
             <CardTitle>{t('analytics.calories_chart_title')}</CardTitle>
           </CardHeader>
-          <CardContent>
-            {isClient ? renderChart('calories', t('general.calories'), 'hsl(var(--primary))', 'bar') : <Skeleton className="h-[300px] w-full" />}
+          <CardContent className="pl-2">
+            {isClient ? renderChart('calories', t('general.calories'), 'bar') : <Skeleton className="h-[300px] w-full" />}
           </CardContent>
         </Card>
         
@@ -245,32 +272,32 @@ export default function AnalyticsPage() {
                 <CardHeader>
                     <CardTitle>{t('analytics.steps_chart_title')}</CardTitle>
                 </CardHeader>
-                <CardContent>
-                    {isClient ? renderChart('steps', t('health_tracker.steps'), 'hsl(var(--chart-2))', 'line') : <Skeleton className="h-[300px] w-full" />}
+                <CardContent className="pl-2">
+                    {isClient ? renderChart('steps', t('health_tracker.steps'), 'line') : <Skeleton className="h-[300px] w-full" />}
                 </CardContent>
             </Card>
             <Card>
                 <CardHeader>
                     <CardTitle>{t('analytics.sleep_chart_title')}</CardTitle>
                 </CardHeader>
-                <CardContent>
-                     {isClient ? renderChart('sleep', t('health_tracker.sleep'), 'hsl(var(--chart-3))', 'line') : <Skeleton className="h-[300px] w-full" />}
+                <CardContent className="pl-2">
+                     {isClient ? renderChart('sleep', t('health_tracker.sleep'), 'line') : <Skeleton className="h-[300px] w-full" />}
                 </CardContent>
             </Card>
             <Card>
                 <CardHeader>
                     <CardTitle>{t('analytics.water_chart_title')}</CardTitle>
                 </CardHeader>
-                <CardContent>
-                     {isClient ? renderChart('water', t('health_tracker.water'), 'hsl(var(--chart-4))', 'bar') : <Skeleton className="h-[300px] w-full" />}
+                <CardContent className="pl-2">
+                     {isClient ? renderChart('water', t('health_tracker.water'), 'bar') : <Skeleton className="h-[300px] w-full" />}
                 </CardContent>
             </Card>
             <Card>
                 <CardHeader>
                     <CardTitle>{t('analytics.workout_chart_title')}</CardTitle>
                 </CardHeader>
-                <CardContent>
-                    {isClient ? renderChart('workout', t('health_tracker.workout'), 'hsl(var(--chart-5))', 'bar') : <Skeleton className="h-[300px] w-full" />}
+                <CardContent className="pl-2">
+                    {isClient ? renderChart('workout', t('health_tracker.workout'), 'bar') : <Skeleton className="h-[300px] w-full" />}
                 </CardContent>
             </Card>
         </div>
@@ -278,3 +305,5 @@ export default function AnalyticsPage() {
     </main>
   );
 }
+
+    
