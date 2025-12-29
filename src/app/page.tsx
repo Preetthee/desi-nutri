@@ -132,68 +132,66 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col flex-1">
-      <main className="flex-1 p-4 md:p-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold font-headline tracking-tight">
-            {t('home.welcome', { name: activeProfile.name })}
-          </h1>
-          <p className="text-muted-foreground">
-            {t('home.subtitle')}
-          </p>
-        </div>
+    <main className="flex-1 p-4 md:p-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold font-headline tracking-tight">
+          {t('home.welcome', { name: activeProfile.name })}
+        </h1>
+        <p className="text-muted-foreground">
+          {t('home.subtitle')}
+        </p>
+      </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          <Card>
-            <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t('home.today_calories')}</CardTitle>
-              <HeartPulse className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{todayCalories.toLocaleString(numberLocale)}</div>
-              <p className="text-xs text-muted-foreground">{t('home.today_calories.description')}</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t('home.daily_trend')}</CardTitle>
-              <TrendIcon className={`h-4 w-4 ${trendColor}`} />
-            </CardHeader>
-            <CardContent>
-              <div className={`text-2xl font-bold ${trendColor}`}>
-                {trendPercentage !== 0 && (trendPercentage > 0 ? '+' : '')}
-                {trendPercentage.toFixed(1)}%
-              </div>
-              <p className="text-xs text-muted-foreground">{t('home.daily_trend.description')}</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Lightbulb className="text-primary" />
-              {t('home.health_tip')}
-            </CardTitle>
-             {activeProfile.healthTip?.[locale]?.context && (
-                <p className="text-xs text-muted-foreground pt-1">{activeProfile.healthTip[locale].context}</p>
-              )}
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card>
+          <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">{t('home.today_calories')}</CardTitle>
+            <HeartPulse className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            {isLoadingTip ? (
-              <div className="space-y-2">
-                <Skeleton className="h-5 w-3/4" />
-                <Skeleton className="h-4 w-full" />
-              </div>
-            ) : (
-                <>
-                  <p className="font-semibold text-lg">"{displayedHealthTip.suggestion}"</p>
-                  <p className="text-muted-foreground mt-2">{displayedHealthTip.explanation}</p>
-                </>
-            )}
+            <div className="text-2xl font-bold">{todayCalories.toLocaleString(numberLocale)}</div>
+            <p className="text-xs text-muted-foreground">{t('home.today_calories.description')}</p>
           </CardContent>
         </Card>
-      </main>
-    </div>
+        <Card>
+          <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">{t('home.daily_trend')}</CardTitle>
+            <TrendIcon className={`h-4 w-4 ${trendColor}`} />
+          </CardHeader>
+          <CardContent>
+            <div className={`text-2xl font-bold ${trendColor}`}>
+              {trendPercentage !== 0 && (trendPercentage > 0 ? '+' : '')}
+              {trendPercentage.toFixed(1)}%
+            </div>
+            <p className="text-xs text-muted-foreground">{t('home.daily_trend.description')}</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Lightbulb className="text-primary" />
+            {t('home.health_tip')}
+          </CardTitle>
+           {activeProfile.healthTip?.[locale]?.context && (
+              <p className="text-xs text-muted-foreground pt-1">{activeProfile.healthTip[locale].context}</p>
+            )}
+        </CardHeader>
+        <CardContent>
+          {isLoadingTip ? (
+            <div className="space-y-2">
+              <Skeleton className="h-5 w-3/4" />
+              <Skeleton className="h-4 w-full" />
+            </div>
+          ) : (
+              <>
+                <p className="font-semibold text-lg">"{displayedHealthTip.suggestion}"</p>
+                <p className="text-muted-foreground mt-2">{displayedHealthTip.explanation}</p>
+              </>
+          )}
+        </CardContent>
+      </Card>
+    </main>
   );
 }

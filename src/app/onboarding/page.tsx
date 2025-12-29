@@ -56,8 +56,8 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
-      <Card className="w-full max-w-lg">
+    <div className="flex min-h-screen items-center justify-center bg-background p-4 md:p-8">
+      <Card className="w-full max-w-lg shadow-lg">
         <CardHeader className="items-center text-center">
             <Logo className="mb-2"/>
           <CardTitle className="text-2xl font-headline">{t('onboarding.welcome')}</CardTitle>
