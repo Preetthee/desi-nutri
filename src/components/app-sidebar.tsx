@@ -3,7 +3,7 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { Home, BarChart, Calculator, HeartPulse, Settings, Dumbbell, Users } from 'lucide-react';
+import { Home, BarChart, Calculator, HeartPulse, Settings, Dumbbell, Users, Activity } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   Sidebar,
@@ -30,6 +30,7 @@ export function AppSidebar() {
     { href: '/', label: t('sidebar.home'), icon: Home },
     { href: '/food-doctor', label: t('sidebar.food_doctor'), icon: HeartPulse },
     { href: '/calorie-tracker', label: t('sidebar.calorie_tracker'), icon: Calculator },
+    { href: '/health-tracker', label: t('sidebar.health_tracker'), icon: Activity },
     { href: '/analytics', label: t('sidebar.analytics'), icon: BarChart },
     { href: '/exercise', label: t('sidebar.exercise'), icon: Dumbbell },
     { href: '/profiles', label: t('sidebar.profiles'), icon: Users },
@@ -39,8 +40,8 @@ export function AppSidebar() {
   function MobileNav() {
     return (
       <nav className="fixed bottom-0 left-0 right-0 z-10 border-t bg-background/95 backdrop-blur-sm md:hidden">
-        <div className="mx-auto flex h-16 max-w-md items-center justify-around">
-          {links.map((link) => (
+        <div className="mx-auto grid h-16 max-w-lg grid-cols-4 items-center justify-around">
+          {links.slice(0, 4).map((link) => (
             <Link
               href={link.href}
               key={link.href}

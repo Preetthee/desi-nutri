@@ -3,7 +3,7 @@
 
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
-import type { UserProfile } from '@/lib/types';
+import type { UserProfile, HealthLog } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 
 type ProfileContextType = {
@@ -11,8 +11,8 @@ type ProfileContextType = {
   activeProfile: UserProfile | null;
   activeProfileId: string | null;
   switchProfile: (profileId: string) => void;
-  addProfile: (newProfileData: Omit<UserProfile, 'id' | 'calorieLogs' | 'foodSuggestions' | 'exerciseSuggestion' | 'healthTip' | 'exerciseChecklist' | 'lastExerciseCheckDate'>) => UserProfile;
-  updateProfile: (updatedProfileData: Omit<UserProfile, 'calorieLogs' | 'foodSuggestions' | 'exerciseSuggestion' | 'healthTip' | 'exerciseChecklist' | 'lastExerciseCheckDate'>) => void;
+  addProfile: (newProfileData: Omit<UserProfile, 'id' | 'calorieLogs' | 'healthLogs' | 'foodSuggestions' | 'exerciseSuggestion' | 'healthTip' | 'exerciseChecklist' | 'lastExerciseCheckDate'>) => UserProfile;
+  updateProfile: (updatedProfileData: Omit<UserProfile, 'id' | 'calorieLogs' | 'healthLogs' | 'foodSuggestions' | 'exerciseSuggestion' | 'healthTip' | 'exerciseChecklist' | 'lastExerciseCheckDate'>) => void;
   deleteProfile: (profileId: string) => void;
   updateActiveProfileData: (data: Partial<Omit<UserProfile, 'id'>>) => void;
   isLoading: boolean;
@@ -40,12 +40,13 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     setActiveProfileId(profileId);
   }, [setActiveProfileId]);
 
-  const addProfile = (newProfileData: Omit<UserProfile, 'id' | 'calorieLogs' | 'foodSuggestions' | 'exerciseSuggestion' | 'healthTip' | 'exerciseChecklist' | 'lastExerciseCheckDate'>) => {
+  const addProfile = (newProfileData: Omit<UserProfile, 'id' | 'calorieLogs' | 'healthLogs' | 'foodSuggestions' | 'exerciseSuggestion' | 'healthTip' | 'exerciseChecklist' | 'lastExerciseCheckDate'>) => {
     const newProfile: UserProfile = {
       ...newProfileData,
       id: new Date().toISOString() + Math.random(),
       dislikedFoods: newProfileData.dislikedFoods || '',
       calorieLogs: [],
+      healthLogs: [],
       foodSuggestions: null,
       exerciseSuggestion: null,
       healthTip: null,
@@ -56,7 +57,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     return newProfile;
   };
 
-  const updateProfile = (updatedProfileData: Omit<UserProfile, 'calorieLogs' | 'foodSuggestions' | 'exerciseSuggestion' | 'healthTip' | 'exerciseChecklist' | 'lastExerciseCheckDate'>) => {
+  const updateProfile = (updatedProfileData: Omit<UserProfile, 'id' | 'calorieLogs' | 'healthLogs' | 'foodSuggestions' | 'exerciseSuggestion' | 'healthTip' | 'exerciseChecklist' | 'lastExerciseCheckDate'>) => {
     setProfiles(prev =>
       prev.map(p => {
         if (p.id === activeProfileId) {

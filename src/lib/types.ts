@@ -53,6 +53,15 @@ export type LocalizedHealthTip = {
   en: HealthTip;
 };
 
+export type HealthLog = {
+  date: string; // YYYY-MM-DD
+  water: number; // in ml
+  steps: number;
+  workoutMinutes: number;
+  sleepHours: number;
+};
+
+
 // New Profile-centric types
 export type UserProfile = {
   id: string;
@@ -64,6 +73,7 @@ export type UserProfile = {
   dislikedFoods: string;
   // Associated data
   calorieLogs: CalorieLog[];
+  healthLogs: HealthLog[];
   foodSuggestions: FoodSuggestions | null;
   exerciseSuggestion: ExerciseSuggestion | null;
   healthTip: LocalizedHealthTip | null;

@@ -3,15 +3,30 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { useProfile } from '@/contexts/profile-provider';
-import type { CalorieLog } from '@/lib/types';
-import { Pie, PieChart, Cell, Legend, Tooltip as RechartsTooltip } from 'recharts';
+import type { CalorieLog, HealthLog } from '@/lib/types';
+import {
+  Line,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  LineChart,
+  BarChart,
+} from 'recharts';
 import {
   ChartContainer,
-  ChartConfig,
+  ChartTooltip as ChartTooltipContainer,
+  ChartTooltipContent,
+  ChartLegend as ChartLegendContainer,
+  ChartLegendContent
 } from '@/components/ui/chart';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import {
   startOfDay,
+  endOfDay,
   format,
   isSameDay,
   startOfWeek,
@@ -33,38 +48,16 @@ import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-const chartConfig = {
-  calories: {
-    label: 'Calories',
-    color: 'hsl(var(--primary))',
-  },
-  sunday: { label: 'Sun', color: 'hsl(var(--chart-1))' },
-  monday: { label: 'Mon', color: 'hsl(var(--chart-2))' },
-  tuesday: { label: 'Tue', color: 'hsl(var(--chart-3))' },
-  wednesday: { label: 'Wed', color: 'hsl(var(--chart-4))' },
-  thursday: { label: 'Thu', color: 'hsl(var(--chart-5))' },
-  friday: { label: 'Fri', color: 'hsl(var(--chart-1))' },
-  saturday: { label: 'Sat', color: 'hsl(var(--chart-2))' },
-} satisfies ChartConfig;
-
-const dayLabelsBn = {
-  sunday: 'রবি',
-  monday: 'সোম',
-  tuesday: 'মঙ্গল',
-  wednesday: 'বুধ',
-  thursday: 'বৃহঃ',
-  friday: 'শুক্র',
-  saturday: 'শনি',
-};
+type ViewMode = 'daily' | 'weekly' | 'monthly';
 
 export default function AnalyticsPage() {
   const { activeProfile, isLoading: isProfileLoading } = useProfile();
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [currentMonth, setCurrentMonth] = useState(new Date());
   const [isClient, setIsClient] = useState(false);
   const { t, locale } = useTranslation();
   const router = useRouter();
+  const [viewMode, setViewMode] = useState<ViewMode>('weekly');
 
   useEffect(() => setIsClient(true), []);
 
@@ -74,101 +67,144 @@ export default function AnalyticsPage() {
     }
   }, [isClient, isProfileLoading, activeProfile, router]);
 
-
-  const logs = activeProfile?.calorieLogs || [];
   const dateLocale = locale === 'bn' ? bn : enUS;
   const numberLocale = locale === 'bn' ? 'bn-BD' : 'en-US';
 
-  const weekdays = useMemo(() => {
-      const firstDayOfWeek = startOfWeek(new Date(), { locale: dateLocale });
-      return Array.from({ length: 7 }).map((_, i) => format(addDays(firstDayOfWeek, i), 'EEE', { locale: dateLocale }));
-  }, [locale, dateLocale]);
+  const calorieLogs = activeProfile?.calorieLogs || [];
+  const healthLogs = activeProfile?.healthLogs || [];
 
-  const dailyLogs = useMemo(() => {
-    const logMap = new Map<string, number>();
-    logs.forEach(log => {
-        try {
-            const day = format(startOfDay(new Date(log.date)), 'yyyy-MM-dd');
-            const currentCalories = logMap.get(day) || 0;
-            logMap.set(day, currentCalories + log.total_calories);
-        } catch(e) {
-            // Ignore invalid dates in logs
-        }
-    });
-    return logMap;
-  }, [logs]);
-
-  const selectedDayLog = useMemo(() => {
-    if (!selectedDate) return null;
-    return logs.filter(log => {
-        try {
-            return isSameDay(new Date(log.date), selectedDate)
-        } catch(e) {
-            return false;
-        }
-    });
-  }, [logs, selectedDate]);
-
-  const monthTotalCalories = useMemo(() => {
-    if (!isClient) return 0;
-    const monthStart = startOfMonth(currentMonth);
-    const monthEnd = endOfMonth(currentMonth);
-    return logs
-        .filter(log => {
-            try {
-                const logDate = new Date(log.date);
-                return logDate >= monthStart && logDate <= monthEnd;
-            } catch(e) {
-                return false;
-            }
-        })
-        .reduce((sum, log) => sum + log.total_calories, 0);
-  }, [logs, currentMonth, isClient]);
-
-  const weeklyPieChartData = useMemo(() => {
-    if (!selectedDate || !isClient) return [];
+  const chartData = useMemo(() => {
+    if (!isClient) return [];
     
-    const weekStart = startOfWeek(selectedDate);
-    const weekEnd = endOfWeek(selectedDate);
-    const weekDays = eachDayOfInterval({ start: weekStart, end: weekEnd });
+    let start, end;
+    const today = new Date();
 
-    if (locale === 'bn') {
-        chartConfig.sunday.label = dayLabelsBn.sunday;
-        chartConfig.monday.label = dayLabelsBn.monday;
-        chartConfig.tuesday.label = dayLabelsBn.tuesday;
-        chartConfig.wednesday.label = dayLabelsBn.wednesday;
-        chartConfig.thursday.label = dayLabelsBn.thursday;
-        chartConfig.friday.label = dayLabelsBn.friday;
-        chartConfig.saturday.label = dayLabelsBn.saturday;
+    switch (viewMode) {
+      case 'daily':
+        start = startOfWeek(today, { locale: dateLocale });
+        end = endOfWeek(today, { locale: dateLocale });
+        break;
+      case 'weekly':
+        start = startOfMonth(today);
+        end = endOfMonth(today);
+        break;
+      case 'monthly':
+        start = startOfDay(subMonths(today, 5));
+        end = endOfDay(today);
+        break;
+    }
+    
+    const interval = eachDayOfInterval({ start, end });
+    
+    const logsByDate = new Map<string, {calories: number; steps: number; water: number; workout: number; sleep: number; count: number }>();
+
+    [...calorieLogs, ...healthLogs].forEach(log => {
+      try {
+          const date = startOfDay(new Date(log.date));
+          const key = format(date, 'yyyy-MM-dd');
+          
+          if (!logsByDate.has(key)) {
+              logsByDate.set(key, { calories: 0, steps: 0, water: 0, workout: 0, sleep: 0, count: 0 });
+          }
+          const entry = logsByDate.get(key)!;
+
+          if ('total_calories' in log) { // CalorieLog
+              entry.calories += log.total_calories;
+          } else { // HealthLog
+              entry.steps = log.steps || entry.steps;
+              entry.water = log.water || entry.water;
+              entry.workout = log.workoutMinutes || entry.workout;
+              entry.sleep = log.sleepHours || entry.sleep;
+          }
+
+      } catch (e) {
+          // Ignore invalid dates
       }
+    });
+
+    if(viewMode === 'monthly') {
+        const monthMap = new Map<string, {calories: number; steps: number; water: number; workout: number; sleep: number; days: number}>();
+        logsByDate.forEach((value, key) => {
+            const monthKey = format(new Date(key), 'yyyy-MM');
+            if(!monthMap.has(monthKey)) {
+                monthMap.set(monthKey, { calories: 0, steps: 0, water: 0, workout: 0, sleep: 0, days: 0 });
+            }
+            const monthEntry = monthMap.get(monthKey)!;
+            monthEntry.calories += value.calories;
+            monthEntry.steps += value.steps;
+            monthEntry.water += value.water;
+            monthEntry.workout += value.workout;
+            monthEntry.sleep += value.sleep;
+            monthEntry.days++;
+        });
+
+        return Array.from(monthMap.entries()).map(([key, value]) => ({
+            name: format(new Date(key), 'MMM yy', { locale: dateLocale }),
+            calories: value.days > 0 ? Math.round(value.calories / value.days) : 0,
+            steps: value.days > 0 ? Math.round(value.steps / value.days) : 0,
+            water: value.days > 0 ? Math.round(value.water / value.days) : 0,
+            workout: value.days > 0 ? Math.round(value.workout / value.days) : 0,
+            sleep: value.days > 0 ? parseFloat((value.sleep / value.days).toFixed(1)) : 0,
+        })).sort((a,b) => new Date(a.name).getTime() - new Date(b.name).getTime());
+    }
+
+    if (viewMode === 'weekly') {
+        const weekMap = new Map<string, {calories: number; steps: number; water: number; workout: number; sleep: number; days: number}>();
+        logsByDate.forEach((value, key) => {
+            const weekStart = startOfWeek(new Date(key), { locale: dateLocale });
+            const weekKey = format(weekStart, 'yyyy-MM-dd');
+            if(!weekMap.has(weekKey)) {
+                weekMap.set(weekKey, { calories: 0, steps: 0, water: 0, workout: 0, sleep: 0, days: 0 });
+            }
+            const weekEntry = weekMap.get(weekKey)!;
+            weekEntry.calories += value.calories;
+            weekEntry.steps += value.steps;
+            weekEntry.water += value.water;
+            weekEntry.workout += value.workout;
+            weekEntry.sleep += value.sleep;
+            if (value.calories > 0 || value.steps > 0 || value.water > 0 || value.workout > 0 || value.sleep > 0) {
+              weekEntry.days++;
+            }
+        });
+        
+        return Array.from(weekMap.entries()).map(([key, value]) => ({
+            name: format(new Date(key), 'MMM d', { locale: dateLocale }),
+            calories: value.days > 0 ? Math.round(value.calories / value.days) : 0,
+            steps: value.days > 0 ? Math.round(value.steps / value.days) : 0,
+            water: value.days > 0 ? Math.round(value.water / value.days) : 0,
+            workout: value.days > 0 ? Math.round(value.workout / value.days) : 0,
+            sleep: value.days > 0 ? parseFloat((value.sleep / value.days).toFixed(1)) : 0,
+        })).sort((a,b) => new Date(a.name).getTime() - new Date(b.name).getTime());
+    }
 
 
-    const data = weekDays.map(day => {
-        const dayKey = format(day, 'yyyy-MM-dd');
-        const total = dailyLogs.get(dayKey) || 0;
-        const dayName = format(day, 'eeee').toLowerCase();
+    return interval.map(day => {
+        const key = format(day, 'yyyy-MM-dd');
+        const data = logsByDate.get(key) || { calories: 0, steps: 0, water: 0, workout: 0, sleep: 0 };
         return {
-            name: chartConfig[dayName as keyof typeof chartConfig]?.label,
-            calories: total,
-            fill: `var(--color-${dayName})`
+            name: format(day, 'EEE', { locale: dateLocale }),
+            ...data
         };
     });
-    
-    return data.some(d => d.calories > 0) ? data : [];
-  }, [selectedDate, dailyLogs, isClient, locale]);
 
-  const calendarDays = useMemo(() => {
-    const monthStart = startOfMonth(currentMonth);
-    const totalDays = getDaysInMonth(currentMonth);
-    const firstDayOfMonth = getDay(monthStart); // 0 for Sunday, 1 for Monday, etc.
+  }, [isClient, calorieLogs, healthLogs, dateLocale, viewMode]);
 
-    const days = Array.from({ length: totalDays }, (_, i) => i + 1);
-    const paddedDays = [...Array(firstDayOfMonth).fill(null), ...days];
-    return paddedDays;
-  }, [currentMonth]);
-  
-  const changeMonth = (amount: number) => {
-    setCurrentMonth(prev => amount > 0 ? addMonths(prev, 1) : subMonths(prev, 1));
+  const renderChart = (dataKey: string, name: string, color: string, type: 'line' | 'bar') => {
+    const ChartComponent = type === 'line' ? LineChart : BarChart;
+    const ChartElement = type === 'line' ? Line : Bar;
+
+    return (
+      <ResponsiveContainer width="100%" height={300}>
+        <ChartComponent data={chartData}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="name" />
+          <YAxis />
+          <Tooltip content={<ChartTooltipContent formatter={(value) => typeof value === 'number' ? value.toLocaleString(numberLocale) : value} />} />
+          <Legend />
+          <ChartElement type="monotone" dataKey={dataKey} name={name} stroke={color} fill={color} />
+        </ChartComponent>
+      </ResponsiveContainer>
+    );
   };
   
   if (isProfileLoading || (isClient && !activeProfile)) {
@@ -186,121 +222,55 @@ export default function AnalyticsPage() {
         <p className="text-muted-foreground">{t('analytics.description')}</p>
       </div>
 
+       <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as ViewMode)} className="mb-8">
+        <TabsList>
+          <TabsTrigger value="daily">{t('analytics.view.daily')}</TabsTrigger>
+          <TabsTrigger value="weekly">{t('analytics.view.weekly')}</TabsTrigger>
+          <TabsTrigger value="monthly">{t('analytics.view.monthly')}</TabsTrigger>
+        </TabsList>
+      </Tabs>
+
       <div className="grid gap-8">
         <Card>
-            <CardHeader>
-                <CardTitle>{t('analytics.calendar_view')}</CardTitle>
-                <CardDescription>
-                    {t('analytics.calendar_view.description', { total: monthTotalCalories.toLocaleString(numberLocale)})}
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                {isClient ? (
-                  <div className="w-full max-w-lg mx-auto">
-                    <div className="flex items-center justify-between mb-4">
-                        <Button variant="outline" size="icon" onClick={() => changeMonth(-1)}>
-                            <ChevronLeft className="h-4 w-4" />
-                        </Button>
-                        <h2 className="text-lg font-semibold font-headline">
-                            {format(currentMonth, 'MMMM yyyy', { locale: dateLocale })}
-                        </h2>
-                        <Button variant="outline" size="icon" onClick={() => changeMonth(1)}>
-                            <ChevronRight className="h-4 w-4" />
-                        </Button>
-                    </div>
-                    <div className="grid grid-cols-7 text-center text-sm text-muted-foreground">
-                        {weekdays.map((day, index) => <div key={`day-${index}`} className="font-medium pb-2">{day}</div>)}
-                    </div>
-                    <div className="grid grid-cols-7 gap-1">
-                        {calendarDays.map((day, index) => {
-                            if (!day) return <div key={`empty-${index}`} />;
-                            
-                            const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-                            const dayKey = format(date, 'yyyy-MM-dd');
-                            const hasLog = dailyLogs.has(dayKey);
-                            const isFuture = isAfter(date, startOfDay(new Date()));
-
-                            return (
-                                <button
-                                    key={day}
-                                    onClick={() => setSelectedDate(date)}
-                                    disabled={isFuture}
-                                    className={cn(
-                                        "h-10 w-10 rounded-full flex items-center justify-center text-sm transition-colors",
-                                        isSameDay(date, new Date()) && !isSameDay(date, selectedDate) && "bg-muted text-foreground",
-                                        isSameDay(date, selectedDate) && "bg-primary text-primary-foreground",
-                                        !isSameDay(date, selectedDate) && !isFuture && "hover:bg-accent hover:text-accent-foreground",
-                                        isFuture && "disabled:opacity-50 disabled:pointer-events-none"
-                                    )}
-                                >
-                                    <div className="relative">
-                                      {day}
-                                      {hasLog && !isFuture && <div className="absolute bottom-[-4px] left-1/2 -translate-x-1/2 h-1 w-1 rounded-full bg-primary" />}
-                                    </div>
-                                </button>
-                            );
-                        })}
-                    </div>
-                  </div>
-                ) : <Skeleton className="w-full h-[337px]" />}
-            </CardContent>
+          <CardHeader>
+            <CardTitle>{t('analytics.calories_chart_title')}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isClient ? renderChart('calories', t('general.calories'), 'hsl(var(--primary))', 'bar') : <Skeleton className="h-[300px] w-full" />}
+          </CardContent>
         </Card>
-
+        
         <div className="grid gap-8 md:grid-cols-2">
-            {selectedDate && (
-                <Card>
-                    <CardHeader>
-                        <CardTitle>{t('analytics.daily_log_for', { date: format(selectedDate, 'PPP', { locale: dateLocale }) })}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        {selectedDayLog && selectedDayLog.length > 0 ? (
-                            <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
-                                {selectedDayLog.map(log => (
-                                    <div key={log.id} className="text-sm border-b pb-2">
-                                        <p className="font-semibold">{log.items.map(i => i.name[locale]).join(', ')}</p>
-                                        <p className="text-xs text-muted-foreground">{log.total_calories.toLocaleString(numberLocale)} {t('general.calories')}</p>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <p className="text-sm text-muted-foreground">{t('analytics.no_log')}</p>
-                        )}
-                    </CardContent>
-                </Card>
-            )}
-
             <Card>
                 <CardHeader>
-                    <CardTitle>{t('analytics.weekly_breakdown')}</CardTitle>
-                    <CardDescription>{t('analytics.weekly_breakdown.description')}</CardDescription>
+                    <CardTitle>{t('analytics.steps_chart_title')}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    {isClient && weeklyPieChartData.length > 0 ? (
-                        <ChartContainer config={chartConfig} className="h-[250px] w-full">
-                            <PieChart>
-                                <RechartsTooltip 
-                                    content={({ active, payload }) => {
-                                        if (active && payload && payload.length) {
-                                            return (
-                                                <div className="bg-background border p-2 rounded-md shadow-lg">
-                                                    <p className="label">{`${payload[0].name} : ${payload[0].value?.toLocaleString(numberLocale)}`}</p>
-                                                </div>
-                                            );
-                                        }
-                                        return null;
-                                    }}
-                                />
-                                <Pie data={weeklyPieChartData} dataKey="calories" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>
-                                    {weeklyPieChartData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={entry.fill} />
-                                    ))}
-                                </Pie>
-                                <Legend />
-                            </PieChart>
-                        </ChartContainer>
-                    ) : isClient ? (
-                        <p className="text-sm text-muted-foreground text-center py-10">{t('analytics.no_data_pie')}</p>
-                    ) : <Skeleton className="w-full h-[250px]" />}
+                    {isClient ? renderChart('steps', t('health_tracker.steps'), 'hsl(var(--chart-2))', 'line') : <Skeleton className="h-[300px] w-full" />}
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader>
+                    <CardTitle>{t('analytics.sleep_chart_title')}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                     {isClient ? renderChart('sleep', t('health_tracker.sleep'), 'hsl(var(--chart-3))', 'line') : <Skeleton className="h-[300px] w-full" />}
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader>
+                    <CardTitle>{t('analytics.water_chart_title')}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                     {isClient ? renderChart('water', t('health_tracker.water'), 'hsl(var(--chart-4))', 'bar') : <Skeleton className="h-[300px] w-full" />}
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader>
+                    <CardTitle>{t('analytics.workout_chart_title')}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    {isClient ? renderChart('workout', t('health_tracker.workout'), 'hsl(var(--chart-5))', 'bar') : <Skeleton className="h-[300px] w-full" />}
                 </CardContent>
             </Card>
         </div>

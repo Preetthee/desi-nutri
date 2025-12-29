@@ -8,11 +8,13 @@ export const en = {
   'general.ai_error': 'AI Error',
   'general.ai_error.description': 'Failed to get a response from AI. Please try again.',
   'general.calories': 'Calories',
+  'general.save': 'Save',
 
   // Sidebar
   'sidebar.home': 'Home',
   'sidebar.food_doctor': 'Food Doctor',
   'sidebar.calorie_tracker': 'Calorie Tracker',
+  'sidebar.health_tracker': 'Health Tracker',
   'sidebar.analytics': 'Analytics',
   'sidebar.exercise': 'Exercise',
   'sidebar.profiles': 'Profiles',
@@ -102,16 +104,32 @@ export const en = {
   'calorie_tracker.log_details.item': 'Item',
   'calorie_tracker.log_details.calories': 'Calories',
 
+  // Health Tracker Page
+  'health_tracker.title': 'Daily Health Tracker',
+  'health_tracker.description': 'Log your daily health metrics.',
+  'health_tracker.log_for_date': 'Log for {date}',
+  'health_tracker.water': 'Water (ml)',
+  'health_tracker.water.placeholder': 'e.g. 2500',
+  'health_tracker.steps': 'Steps',
+  'health_tracker.steps.placeholder': 'e.g. 10000',
+  'health_tracker.workout': 'Workout (minutes)',
+  'health_tracker.workout.placeholder': 'e.g. 30',
+  'health_tracker.sleep': 'Sleep (hours)',
+  'health_tracker.sleep.placeholder': 'e.g. 8',
+  'health_tracker.success': 'Health log saved successfully!',
+
   // Analytics Page
-  'analytics.title': 'Calorie Analytics',
-  'analytics.description': 'View details of your calorie intake.',
-  'analytics.calendar_view': 'Calendar View',
-  'analytics.calendar_view.description': 'Click on a date to see the log for that day. Total calories for the month: {total}',
-  'analytics.daily_log_for': 'Daily Log for {date}',
-  'analytics.no_log': 'No log found for this day.',
-  'analytics.weekly_breakdown': 'Weekly Breakdown',
-  'analytics.weekly_breakdown.description': 'Pie chart showing calorie distribution for the current week.',
-  'analytics.no_data_pie': 'Not enough data for this week to display a chart.',
+  'analytics.title': 'Health Analytics',
+  'analytics.description': 'View details of your calorie and health metrics intake.',
+  'analytics.view.daily': 'Daily',
+  'analytics.view.weekly': 'Weekly',
+  'analytics.view.monthly': 'Monthly',
+  'analytics.calories_chart_title': 'Avg Daily Calorie Intake',
+  'analytics.steps_chart_title': 'Avg Daily Steps',
+  'analytics.sleep_chart_title': 'Avg Daily Sleep',
+  'analytics.water_chart_title': 'Avg Daily Water Intake',
+  'analytics.workout_chart_title': 'Avg Daily Workout',
+
 
   // Exercise Page
   'exercise.title': 'Exercise Guide',
