@@ -47,6 +47,7 @@ export default function SettingsPage() {
     height: z.coerce.number().min(1, t('onboarding.height.error')),
     weight: z.coerce.number().min(1, t('onboarding.weight.error')),
     health_info: z.string().min(10, t('onboarding.health_info.error')),
+    dislikedFoods: z.string().optional(),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -57,6 +58,7 @@ export default function SettingsPage() {
       height: 0,
       weight: 0,
       health_info: '',
+      dislikedFoods: '',
     },
   });
   
@@ -182,6 +184,22 @@ export default function SettingsPage() {
                         <FormMessage />
                     </FormItem>
                     )}
+                />
+                <FormField
+                  control={form.control}
+                  name="dislikedFoods"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('onboarding.disliked_foods')}</FormLabel>
+                      <FormControl>
+                        <Input placeholder={t('onboarding.disliked_foods.placeholder')} {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        {t('onboarding.disliked_foods.description')}
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
                 <Button type="submit" className="w-full">{t('settings.profile.submit')}</Button>
                 </form>

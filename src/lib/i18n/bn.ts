@@ -36,7 +36,7 @@ export const bn = {
   'onboarding.name.placeholder': 'উদাহরণ: জন ডো',
   'onboarding.name.error': 'নাম কমপক্ষে ২ অক্ষরের হতে হবে।',
   'onboarding.age': 'বয়স',
-  'onboarding.age.placeholder': 'উদাহরণ: ৩০',
+  'onboarding.age.placeholder': ' উদাহরণ: ৩০',
   'onboarding.age.error': 'বয়স আবশ্যক।',
   'onboarding.height': 'উচ্চতা (সেমি)',
   'onboarding.height.placeholder': 'উদাহরণ: ১৭০',
@@ -48,6 +48,9 @@ export const bn = {
   'onboarding.health_info.placeholder': 'উদাহরণ: ওজন কমাতে চাই, নিরামিষাশী।',
   'onboarding.health_info.description': 'এটি আমাদের আপনাকে আরও ভালো পরামর্শ দিতে সাহায্য করবে।',
   'onboarding.health_info.error': 'অনুগ্রহ করে কিছু স্বাস্থ্য সম্পর্কিত তথ্য দিন।',
+  'onboarding.disliked_foods': 'অপছন্দের খাবার (ঐচ্ছিক)',
+  'onboarding.disliked_foods.placeholder': 'উদাহরণ: করলা, পটল',
+  'onboarding.disliked_foods.description': 'কমা দিয়ে একাধিক খাবার আলাদা করুন।',
   'onboarding.submit': 'প্রোফাইল তৈরি করুন',
 
   // Profiles Page
@@ -112,7 +115,7 @@ export const bn = {
 
   // Exercise Page
   'exercise.title': 'ব্যায়াম গাইড',
-  'exercise.description': 'আপনার ব্যক্তিগত AI-চালিত ব্যায়াম প্রশিক্ষক।',
+  'exercise.description': 'আপনার ব্যক্তিগত AI-চালিত ব্যায়am প্রশিক্ষক।',
   'exercise.bmi_status.title': 'আপনার বর্তমান অবস্থা',
   'exercise.bmi_status.description': 'আপনার BMI হলো {bmi}, যা {status} হিসাবে বিবেচিত।',
   'exercise.bmi_status.underweight': 'কম ওজন',

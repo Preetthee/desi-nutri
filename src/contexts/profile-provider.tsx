@@ -44,6 +44,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     const newProfile: UserProfile = {
       ...newProfileData,
       id: new Date().toISOString() + Math.random(),
+      dislikedFoods: newProfileData.dislikedFoods || '',
       calorieLogs: [],
       foodSuggestions: null,
       exerciseSuggestion: null,
@@ -61,7 +62,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
         if (p.id === activeProfileId) {
           // Preserve associated data
           const originalData = profiles.find(prof => prof.id === activeProfileId);
-          const isProfileChanged = p.name !== updatedProfileData.name || p.age !== updatedProfileData.age || p.height !== updatedProfileData.height || p.weight !== updatedProfileData.weight || p.health_info !== updatedProfileData.health_info;
+          const isProfileChanged = p.name !== updatedProfileData.name || p.age !== updatedProfileData.age || p.height !== updatedProfileData.height || p.weight !== updatedProfileData.weight || p.health_info !== updatedProfileData.health_info || p.dislikedFoods !== updatedProfileData.dislikedFoods;
           
           return {
             ...p,

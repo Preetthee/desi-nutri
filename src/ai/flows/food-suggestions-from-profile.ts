@@ -18,6 +18,7 @@ const FoodSuggestionsInputSchema = z.object({
   height: z.number().describe('The height of the user in cm.'),
   weight: z.number().describe('The weight of the user in kg.'),
   health_info: z.string().describe('Additional health information and goals for the user (e.g., "want to lose weight, vegetarian, allergic to peanuts").'),
+  dislikedFoods: z.string().optional().describe('A comma-separated list of foods the user dislikes.'),
 });
 export type FoodSuggestionsInput = z.infer<typeof FoodSuggestionsInputSchema>;
 
@@ -44,10 +45,20 @@ const foodSuggestionsPrompt = ai.definePrompt({
   output: {schema: FoodSuggestionsOutputSchema},
   prompt: `You are a food and nutrition expert. Based on user info below, suggest a food guide.
 The entire response must be in both Bengali and English.
-CRITICAL: The user's health information may contain allergies. Read it carefully. NEVER recommend any food that contains a user's allergens. If the user mentions allergies, list those foods in the 'foods_to_avoid' section with the reason being the allergy.
-Also, mention potential side effects for recommended foods if relevant (e.g., "high in sugar, eat in moderation").
 
-User info: Name={{name}}, Age={{age}}, Height={{height}}, Weight={{weight}}, Health Info & Allergies="{{health_info}}"
+CRITICAL SAFETY INSTRUCTIONS:
+1.  The user's health information may contain allergies. Read it carefully. NEVER recommend any food that contains a user's allergens. If the user mentions allergies, list those foods in the 'foods_to_avoid' section with the reason being the allergy.
+2.  The user has provided a list of disliked foods. DO NOT recommend any of these foods in any section (recommended, budget, or meal plan). If a disliked food is nutritionally important, suggest a close alternative.
+
+User info:
+- Name: {{name}}
+- Age: {{age}}
+- Height: {{height}}
+- Weight: {{weight}}
+- Health Info & Allergies: "{{health_info}}"
+- Disliked Foods: "{{dislikedFoods}}"
+
+Also, mention potential side effects for recommended foods if relevant (e.g., "high in sugar, eat in moderation").
 
 Return JSON in this exact format:
 {

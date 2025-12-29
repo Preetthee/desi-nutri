@@ -48,6 +48,9 @@ export const en = {
   'onboarding.health_info.placeholder': 'e.g., Want to lose weight, vegetarian.',
   'onboarding.health_info.description': 'This helps us give you better recommendations.',
   'onboarding.health_info.error': 'Please provide some health information.',
+  'onboarding.disliked_foods': 'Disliked Foods (Optional)',
+  'onboarding.disliked_foods.placeholder': 'e.g., Bitter Gourd, Okra',
+  'onboarding.disliked_foods.description': 'Separate multiple foods with a comma.',
   'onboarding.submit': 'Create Profile',
 
   // Profiles Page
@@ -122,9 +125,9 @@ export const en = {
   'exercise.bmi_status.recommendation': 'Regular exercise is recommended to improve your health.',
   'exercise.plan.title': 'Your Daily Exercise Plan',
   'exercise.plan.description': 'The AI has generated a simple exercise plan for you.',
-  'exercise.plan.checklist_title': 'Today\'s Checklist',
+  'exercise.plan.checklist_title': "Today's Checklist",
   'exercise.plan.minutes': 'minutes',
-  'exercise.plan.completed': 'Great job! You\'ve completed all exercises for today!',
+  'exercise.plan.completed': "Great job! You've completed all exercises for today!",
   'exercise.plan.completed_subtext': 'Congratulations on your consistency!',
 
 

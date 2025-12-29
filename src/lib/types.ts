@@ -61,6 +61,7 @@ export type UserProfile = {
   height: number;
   weight: number;
   health_info: string;
+  dislikedFoods: string;
   // Associated data
   calorieLogs: CalorieLog[];
   foodSuggestions: FoodSuggestions | null;
