@@ -13,11 +13,9 @@ export const en = {
   // Sidebar
   'sidebar.home': 'Home',
   'sidebar.food_doctor': 'Food Doctor',
-  'sidebar.calorie_tracker': 'Calorie Tracker',
-  'sidebar.health_tracker': 'Health Tracker',
+  'sidebar.daily_tracker': 'Daily Tracker',
   'sidebar.analytics': 'Analytics',
   'sidebar.exercise': 'Exercise',
-  'sidebar.profiles': 'Profiles',
   'sidebar.settings': 'Settings',
 
   // Home Page
@@ -55,12 +53,14 @@ export const en = {
   'onboarding.disliked_foods.description': 'Separate multiple foods with a comma.',
   'onboarding.submit': 'Create Profile',
 
-  // Profiles Page
-  'profiles.title': 'Manage Profiles',
-  'profiles.description': 'Select a profile or create a new one.',
+  // Profiles Page (now in Settings)
+  'profiles.title': 'Account & Profiles',
+  'profiles.description': 'Manage your profiles or create a new one.',
   'profiles.add_new': 'Add New Profile',
   'profiles.switch_to': 'Switch to this Profile',
   'profiles.active': 'Active',
+  'profiles.active_profile': 'Active profile: {name}',
+  'profiles.select_placeholder': 'Select a profile',
   'profiles.delete': 'Delete',
   'profiles.delete.confirm.title': 'Delete Profile?',
   'profiles.delete.confirm.description': 'This action cannot be undone. This will permanently delete all data for this profile.',
@@ -88,35 +88,32 @@ export const en = {
   'food_doctor.foods_to_avoid.title': 'Foods to Avoid',
   'food_doctor.no_suggestions': 'Click "Regenerate" to get your personalized food plan.',
 
-  // Calorie Tracker Page
-  'calorie_tracker.title': 'Calorie Tracker',
-  'calorie_tracker.description': 'Log your meals and let AI do the counting.',
-  'calorie_tracker.new_log.title': 'Log a New Meal',
-  'calorie_tracker.new_log.description': 'Describe what you ate, e.g., "A bowl of oats with blueberries and a coffee".',
-  'calorie_tracker.new_log.placeholder': 'e.g., 2 rotis, mixed vegetables, and a piece of fish.',
-  'calorie_tracker.new_log.button': 'Estimate Calories',
-  'calorie_tracker.new_log.estimating': 'Estimating calories...',
-  'calorie_tracker.new_log.error': 'Failed to estimate calories. Please try again.',
-  'calorie_tracker.recent_logs.title': 'Recent Logs',
-  'calorie_tracker.recent_logs.description': 'View details of your logged meals.',
-  'calorie_tracker.recent_logs.loading': 'Loading logs...',
-  'calorie_tracker.recent_logs.empty': 'No meals have been logged yet.',
-  'calorie_tracker.log_details.item': 'Item',
-  'calorie_tracker.log_details.calories': 'Calories',
+  // Daily Tracker page (replaces Calorie and Health trackers)
+  'daily_tracker.title': 'Daily Tracker',
+  'daily_tracker.description': 'Log your meals and health metrics in one place.',
+  'daily_tracker.log_for_date': 'Log for {date}',
+  'daily_tracker.food_log.title': 'Food & Calories',
+  'daily_tracker.food_log.description': 'Describe what you ate, e.g., "A bowl of oats with blueberries and a coffee".',
+  'daily_tracker.food_log.placeholder': 'e.g., 2 rotis, mixed vegetables, and a piece of fish.',
+  'daily_tracker.food_log.button': 'Estimate Calories',
+  'daily_tracker.food_log.estimating': 'Estimating calories...',
+  'daily_tracker.food_log.error': 'Failed to estimate calories. Please try again.',
+  'daily_tracker.recent_logs.title': "Today's Logs",
+  'daily_tracker.recent_logs.description': 'View details of your logged meals.',
+  'daily_tracker.recent_logs.empty': 'No meals have been logged yet for this date.',
+  'daily_tracker.log_details.item': 'Item',
+  'daily_tracker.log_details.calories': 'Calories',
+  'daily_tracker.health_metrics.title': 'Health Metrics',
+  'daily_tracker.health_metrics.water': 'Water (ml)',
+  'daily_tracker.health_metrics.water.placeholder': 'e.g. 2500',
+  'daily_tracker.health_metrics.steps': 'Steps',
+  'daily_tracker.health_metrics.steps.placeholder': 'e.g. 10000',
+  'daily_tracker.health_metrics.workout': 'Workout (minutes)',
+  'daily_tracker.health_metrics.workout.placeholder': 'e.g. 30',
+  'daily_tracker.health_metrics.sleep': 'Sleep (hours)',
+  'daily_tracker.health_metrics.sleep.placeholder': 'e.g. 8',
+  'daily_tracker.health_metrics.success': 'Health log saved successfully!',
 
-  // Health Tracker Page
-  'health_tracker.title': 'Daily Health Tracker',
-  'health_tracker.description': 'Log your daily health metrics.',
-  'health_tracker.log_for_date': 'Log for {date}',
-  'health_tracker.water': 'Water (ml)',
-  'health_tracker.water.placeholder': 'e.g. 2500',
-  'health_tracker.steps': 'Steps',
-  'health_tracker.steps.placeholder': 'e.g. 10000',
-  'health_tracker.workout': 'Workout (minutes)',
-  'health_tracker.workout.placeholder': 'e.g. 30',
-  'health_tracker.sleep': 'Sleep (hours)',
-  'health_tracker.sleep.placeholder': 'e.g. 8',
-  'health_tracker.success': 'Health log saved successfully!',
 
   // Analytics Page
   'analytics.title': 'Health Analytics',
@@ -151,8 +148,9 @@ export const en = {
 
   // Settings Page
   'settings.title': 'Settings',
-  'settings.description': 'Manage your personal and health information.',
-  'settings.profile.title': 'Edit Profile',
+  'settings.description': 'Manage your profile, preferences, and app settings.',
+  'settings.profile.edit_title': 'Edit Profile: {name}',
+  'settings.profile.edit': 'Edit',
   'settings.profile.description': 'Update your details here.',
   'settings.profile.success': 'Your profile has been updated successfully.',
   'settings.profile.submit': 'Save Changes',
@@ -165,3 +163,5 @@ export const en = {
   'settings.danger_zone.confirm.cancel': 'Cancel',
   'settings.danger_zone.confirm.continue': 'Continue',
 };
+
+    

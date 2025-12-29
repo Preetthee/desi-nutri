@@ -13,11 +13,9 @@ export const bn = {
   // Sidebar
   'sidebar.home': 'হোম',
   'sidebar.food_doctor': 'ফুড ডক্টর',
-  'sidebar.calorie_tracker': 'ক্যালোরি ট্র্যাকার',
-  'sidebar.health_tracker': 'স্বাস্থ্য ট্র্যাকার',
+  'sidebar.daily_tracker': 'দৈনিক ট্র্যাকার',
   'sidebar.analytics': 'বিশ্লেষণ',
   'sidebar.exercise': 'ব্যায়াম',
-  'sidebar.profiles': 'প্রোফাইল',
   'sidebar.settings': 'সেটিংস',
 
   // Home Page
@@ -55,16 +53,17 @@ export const bn = {
   'onboarding.disliked_foods.description': 'কমা দিয়ে একাধিক খাবার আলাদা করুন।',
   'onboarding.submit': 'প্রোফাইল তৈরি করুন',
 
-  // Profiles Page
-  'profiles.title': 'প্রোফাইল পরিচালনা করুন',
-  'profiles.description': 'একটি প্রোফাইল নির্বাচন করুন বা একটি নতুন তৈরি করুন।',
+  // Profiles Page (now in Settings)
+  'profiles.title': 'অ্যাকাউন্ট ও প্রোফাইল',
+  'profiles.description': 'আপনার প্রোফাইল পরিচালনা করুন বা একটি নতুন তৈরি করুন।',
   'profiles.add_new': 'নতুন প্রোফাইল যোগ করুন',
   'profiles.switch_to': 'এই প্রোফাইল ব্যবহার করুন',
   'profiles.active': 'সক্রিয়',
+  'profiles.active_profile': 'সক্রিয় প্রোফাইল: {name}',
+  'profiles.select_placeholder': 'একটি প্রোফাইল নির্বাচন করুন',
   'profiles.delete': 'মুছে ফেলুন',
   'profiles.delete.confirm.title': 'প্রোফাইল মুছে ফেলতে চান?',
   'profiles.delete.confirm.description': 'এই ক্রিয়াটি ফিরিয়ে আনা যাবে না। এটি স্থায়ীভাবে এই প্রোফাইলের সমস্ত ডেটা মুছে ফেলবে।',
-
 
   // Food Doctor Page
   'food_doctor.title': 'ফুড ডক্টর',
@@ -87,36 +86,32 @@ export const bn = {
   'food_doctor.budget_friendly_foods.title': 'বাজেট-বান্ধব খাবার',
   'food_doctor.foods_to_avoid.title': 'যেসব খাবার এড়িয়ে চলতে হবে',
   'food_doctor.no_suggestions': 'আপনার ব্যক্তিগতকৃত খাদ্য পরিকল্পনা পেতে "পুনরায় তৈরি করুন" ক্লিক করুন।',
-
-  // Calorie Tracker Page
-  'calorie_tracker.title': 'ক্যালোরি ট্র্যাকার',
-  'calorie_tracker.description': 'আপনার খাবার লগ করুন এবং AI-কে গণনা করতে দিন।',
-  'calorie_tracker.new_log.title': 'নতুন খাবার লগ করুন',
-  'calorie_tracker.new_log.description': 'আপনি কী খেয়েছেন তা বর্ণনা করুন, যেমন: "এক বাটি ওটস সাথে ব্লুবেরি এবং একটি কফি"।',
-  'calorie_tracker.new_log.placeholder': 'উদাহরণ: ২টি রুটি, সবজি এবং এক টুকরো মাছ।',
-  'calorie_tracker.new_log.button': 'ক্যালোরি অনুমান করুন',
-  'calorie_tracker.new_log.estimating': 'ক্যালোরি অনুমান করা হচ্ছে...',
-  'calorie_tracker.new_log.error': 'ক্যালোরি অনুমান করতে ব্যর্থ। অনুগ্রহ করে আবার চেষ্টা করুন।',
-  'calorie_tracker.recent_logs.title': 'সাম্প্রতিক লগ',
-  'calorie_tracker.recent_logs.description': 'আপনার লগ করা খাবারের বিস্তারিত দেখুন।',
-  'calorie_tracker.recent_logs.loading': 'লগ লোড হচ্ছে...',
-  'calorie_tracker.recent_logs.empty': 'এখনও কোনো খাবার লগ করা হয়নি।',
-  'calorie_tracker.log_details.item': 'খাবারের নাম',
-  'calorie_tracker.log_details.calories': 'ক্যালোরি',
-
-  // Health Tracker Page
-  'health_tracker.title': 'দৈনিক স্বাস্থ্য ট্র্যাকার',
-  'health_tracker.description': 'আপনার দৈনন্দিন স্বাস্থ্য মেট্রিক্স লগ করুন।',
-  'health_tracker.log_for_date': '{date}-এর জন্য লগ',
-  'health_tracker.water': 'জল (মিলি)',
-  'health_tracker.water.placeholder': 'উদাহরণ: ২৫০০',
-  'health_tracker.steps': 'পদক্ষেপ',
-  'health_tracker.steps.placeholder': 'উদাহরণ: ১০০০০',
-  'health_tracker.workout': 'ওয়ার্কআউট (মিনিট)',
-  'health_tracker.workout.placeholder': 'উদাহরণ: ৩০',
-  'health_tracker.sleep': 'ঘুম (ঘন্টা)',
-  'health_tracker.sleep.placeholder': 'উদাহরণ: ৮',
-  'health_tracker.success': 'স্বাস্থ্য লগ সফলভাবে সংরক্ষিত হয়েছে!',
+  
+  // Daily Tracker page (replaces Calorie and Health trackers)
+  'daily_tracker.title': 'দৈনিক ট্র্যাকার',
+  'daily_tracker.description': 'আপনার খাবার এবং স্বাস্থ্য মেট্রিক্স এক জায়গায় লগ করুন।',
+  'daily_tracker.log_for_date': '{date}-এর জন্য লগ',
+  'daily_tracker.food_log.title': 'খাবার এবং ক্যালোরি',
+  'daily_tracker.food_log.description': 'আপনি কী খেয়েছেন তা বর্ণনা করুন, যেমন: "এক বাটি ওটস সাথে ব্লুবেরি এবং একটি কফি"।',
+  'daily_tracker.food_log.placeholder': 'উদাহরণ: ২টি রুটি, সবজি এবং এক টুকরো মাছ।',
+  'daily_tracker.food_log.button': 'ক্যালোরি অনুমান করুন',
+  'daily_tracker.food_log.estimating': 'ক্যালোরি অনুমান করা হচ্ছে...',
+  'daily_tracker.food_log.error': 'ক্যালোরি অনুমান করতে ব্যর্থ। অনুগ্রহ করে আবার চেষ্টা করুন।',
+  'daily_tracker.recent_logs.title': 'আজকের লগ',
+  'daily_tracker.recent_logs.description': 'আপনার লগ করা খাবারের বিস্তারিত দেখুন।',
+  'daily_tracker.recent_logs.empty': 'এখনও কোনো খাবার লগ করা হয়নি।',
+  'daily_tracker.log_details.item': 'খাবারের নাম',
+  'daily_tracker.log_details.calories': 'ক্যালোরি',
+  'daily_tracker.health_metrics.title': 'স্বাস্থ্য মেট্রিক্স',
+  'daily_tracker.health_metrics.water': 'জল (মিলি)',
+  'daily_tracker.health_metrics.water.placeholder': 'উদাহরণ: ২৫০০',
+  'daily_tracker.health_metrics.steps': 'পদক্ষেপ',
+  'daily_tracker.health_metrics.steps.placeholder': 'উদাহরণ: ১০০০০',
+  'daily_tracker.health_metrics.workout': 'ওয়ার্কআউট (মিনিট)',
+  'daily_tracker.health_metrics.workout.placeholder': 'উদাহরণ: ৩০',
+  'daily_tracker.health_metrics.sleep': 'ঘুম (ঘন্টা)',
+  'daily_tracker.health_metrics.sleep.placeholder': 'উদাহরণ: ৮',
+  'daily_tracker.health_metrics.success': 'স্বাস্থ্য লগ সফলভাবে সংরক্ষিত হয়েছে!',
 
   // Analytics Page
   'analytics.title': 'স্বাস্থ্য বিশ্লেষণ',
@@ -147,11 +142,11 @@ export const bn = {
   'exercise.plan.completed': 'দারুণ! আপনি আজকের সব ব্যায়াম সম্পন্ন করেছেন!',
   'exercise.plan.completed_subtext': 'আপনার ধারাবাহিকতার জন্য অভিনন্দন!',
 
-
   // Settings Page
   'settings.title': 'সেটিংস',
-  'settings.description': 'আপনার ব্যক্তিগত এবং স্বাস্থ্য সম্পর্কিত তথ্য পরিচালনা করুন।',
-  'settings.profile.title': 'প্রোফাইল সম্পাদনা করুন',
+  'settings.description': 'আপনার প্রোফাইল, পছন্দ এবং অ্যাপ সেটিংস পরিচালনা করুন।',
+  'settings.profile.edit_title': 'প্রোফাইল সম্পাদনা করুন: {name}',
+  'settings.profile.edit': 'সম্পাদনা করুন',
   'settings.profile.description': 'আপনার বিবরণ এখানে আপডেট করুন।',
   'settings.profile.success': 'আপনার প্রোফাইল সফলভাবে আপডেট করা হয়েছে।',
   'settings.profile.submit': 'পরিবর্তনগুলি সংরক্ষণ করুন',
@@ -164,3 +159,5 @@ export const bn = {
   'settings.danger_zone.confirm.cancel': 'বাতিল করুন',
   'settings.danger_zone.confirm.continue': 'চালিয়ে যান',
 };
+
+    

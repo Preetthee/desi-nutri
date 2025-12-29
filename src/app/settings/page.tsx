@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -31,15 +31,17 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Trash2 } from 'lucide-react';
+import { Trash2, User, PlusCircle, Edit, CheckCircle } from 'lucide-react';
 import { useTranslation } from '@/contexts/language-provider';
 import { useProfile } from '@/contexts/profile-provider';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export default function SettingsPage() {
-  const { activeProfile, updateProfile, deleteProfile, isLoading } = useProfile();
+  const { activeProfile, updateProfile, deleteProfile, isLoading, profiles, activeProfileId, switchProfile } = useProfile();
   const router = useRouter();
   const { toast } = useToast();
   const { t } = useTranslation();
+  const [isEditing, setIsEditing] = useState(false);
 
   const formSchema = z.object({
     name: z.string().min(2, t('onboarding.name.error')),
@@ -67,6 +69,7 @@ export default function SettingsPage() {
       router.replace('/onboarding');
     } else if (activeProfile) {
       form.reset(activeProfile);
+      setIsEditing(false); // Reset editing state on profile switch
     }
   }, [activeProfile, isLoading, form, router]);
 
@@ -76,6 +79,7 @@ export default function SettingsPage() {
     toast({
         title: t('settings.profile.success'),
     });
+    setIsEditing(false);
   }
 
   function handleDeleteProfile() {
@@ -97,115 +101,155 @@ export default function SettingsPage() {
 
   return (
     <main className="flex-1 p-4 md:p-8">
-       <div className="flex items-center justify-between mb-8">
-        <div>
+       <div className="mb-8">
           <h1 className="text-3xl font-bold font-headline tracking-tight">{t('settings.title')}</h1>
           <p className="text-muted-foreground">{t('settings.description')}</p>
         </div>
-      </div>
       <div className="w-full max-w-2xl mx-auto space-y-8">
         <Card>
             <CardHeader>
-            <CardTitle>{t('settings.profile.title')}</CardTitle>
-            <CardDescription>{t('settings.profile.description')}</CardDescription>
+                <CardTitle>{t('profiles.title')}</CardTitle>
+                <CardDescription>{t('profiles.description')}</CardDescription>
             </CardHeader>
-            <CardContent>
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>{t('onboarding.name')}</FormLabel>
-                        <FormControl>
-                        <Input placeholder={t('onboarding.name.placeholder')} {...field} />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                    )}
-                />
-                <div className="grid grid-cols-3 gap-4">
-                    <FormField
-                    control={form.control}
-                    name="age"
-                    render={({ field }) => (
-                        <FormItem>
-                        <FormLabel>{t('onboarding.age')}</FormLabel>
-                        <FormControl>
-                            <Input type="number" placeholder={t('onboarding.age.placeholder')} {...field} onChange={e => field.onChange(e.target.valueAsNumber || 0)} />
-                        </FormControl>
-                        <FormMessage />
-                        </FormItem>
-                    )}
-                    />
-                    <FormField
-                    control={form.control}
-                    name="height"
-                    render={({ field }) => (
-                        <FormItem>
-                        <FormLabel>{t('onboarding.height')}</FormLabel>
-                        <FormControl>
-                            <Input type="number" placeholder={t('onboarding.height.placeholder')} {...field} onChange={e => field.onChange(e.target.valueAsNumber || 0)} />
-                        </FormControl>
-                        <FormMessage />
-                        </FormItem>
-                    )}
-                    />
-                    <FormField
-                    control={form.control}
-                    name="weight"
-                    render={({ field }) => (
-                        <FormItem>
-                        <FormLabel>{t('onboarding.weight')}</FormLabel>
-                        <FormControl>
-                            <Input type="number" placeholder={t('onboarding.weight.placeholder')} {...field} onChange={e => field.onChange(e.target.valueAsNumber || 0)} />
-                        </FormControl>
-                        <FormMessage />
-                        </FormItem>
-                    )}
-                    />
+            <CardContent className="space-y-4">
+                <div className="flex items-center gap-4">
+                    <Select value={activeProfileId || ''} onValueChange={switchProfile}>
+                        <SelectTrigger className="flex-1">
+                            <SelectValue placeholder={t('profiles.select_placeholder')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {profiles.map(p => (
+                                <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    <Button variant="outline" size="icon" onClick={() => router.push('/onboarding')}>
+                        <PlusCircle className="h-5 w-5"/>
+                        <span className="sr-only">{t('profiles.add_new')}</span>
+                    </Button>
                 </div>
-                <FormField
-                    control={form.control}
-                    name="health_info"
-                    render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>{t('onboarding.health_info')}</FormLabel>
-                        <FormControl>
-                        <Textarea
-                            placeholder={t('onboarding.health_info.placeholder')}
-                            {...field}
-                        />
-                        </FormControl>
-                        <FormDescription>
-                        {t('onboarding.health_info.description')}
-                        </FormDescription>
-                        <FormMessage />
-                    </FormItem>
-                    )}
-                />
-                <FormField
-                  control={form.control}
-                  name="dislikedFoods"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('onboarding.disliked_foods')}</FormLabel>
-                      <FormControl>
-                        <Input placeholder={t('onboarding.disliked_foods.placeholder')} {...field} />
-                      </FormControl>
-                      <FormDescription>
-                        {t('onboarding.disliked_foods.description')}
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button type="submit" className="w-full">{t('settings.profile.submit')}</Button>
-                </form>
-            </Form>
+                 {activeProfile && (
+                     <div className="p-3 bg-muted/50 rounded-lg border flex items-center justify-between">
+                         <div className="flex items-center gap-2">
+                            <CheckCircle className="h-5 w-5 text-green-500"/>
+                            <p className="text-sm font-medium">{t('profiles.active_profile', {name: activeProfile.name})}</p>
+                         </div>
+                        <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)}>
+                            <Edit className="mr-2 h-4 w-4" />
+                            {t('settings.profile.edit')}
+                        </Button>
+                     </div>
+                 )}
             </CardContent>
         </Card>
+
+        {(isEditing && activeProfile) && (
+            <Card>
+                <CardHeader>
+                <CardTitle>{t('settings.profile.edit_title', {name: activeProfile.name})}</CardTitle>
+                <CardDescription>{t('settings.profile.description')}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                    <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>{t('onboarding.name')}</FormLabel>
+                            <FormControl>
+                            <Input placeholder={t('onboarding.name.placeholder')} {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                    <div className="grid grid-cols-3 gap-4">
+                        <FormField
+                        control={form.control}
+                        name="age"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>{t('onboarding.age')}</FormLabel>
+                            <FormControl>
+                                <Input type="number" placeholder={t('onboarding.age.placeholder')} {...field} onChange={e => field.onChange(e.target.valueAsNumber || 0)} />
+                            </FormControl>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                        />
+                        <FormField
+                        control={form.control}
+                        name="height"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>{t('onboarding.height')}</FormLabel>
+                            <FormControl>
+                                <Input type="number" placeholder={t('onboarding.height.placeholder')} {...field} onChange={e => field.onChange(e.target.valueAsNumber || 0)} />
+                            </FormControl>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                        />
+                        <FormField
+                        control={form.control}
+                        name="weight"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>{t('onboarding.weight')}</FormLabel>
+                            <FormControl>
+                                <Input type="number" placeholder={t('onboarding.weight.placeholder')} {...field} onChange={e => field.onChange(e.target.valueAsNumber || 0)} />
+                            </FormControl>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                        />
+                    </div>
+                    <FormField
+                        control={form.control}
+                        name="health_info"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>{t('onboarding.health_info')}</FormLabel>
+                            <FormControl>
+                            <Textarea
+                                placeholder={t('onboarding.health_info.placeholder')}
+                                {...field}
+                            />
+                            </FormControl>
+                            <FormDescription>
+                            {t('onboarding.health_info.description')}
+                            </FormDescription>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="dislikedFoods"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('onboarding.disliked_foods')}</FormLabel>
+                          <FormControl>
+                            <Input placeholder={t('onboarding.disliked_foods.placeholder')} {...field} />
+                          </FormControl>
+                          <FormDescription>
+                            {t('onboarding.disliked_foods.description')}
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <div className="flex gap-2">
+                        <Button type="submit" className="flex-1">{t('settings.profile.submit')}</Button>
+                        <Button type="button" variant="outline" onClick={() => { form.reset(activeProfile); setIsEditing(false); }}>{t('settings.danger_zone.confirm.cancel')}</Button>
+                    </div>
+                    </form>
+                </Form>
+                </CardContent>
+            </Card>
+        )}
 
         <Card className="border-destructive">
             <CardHeader>
@@ -239,3 +283,5 @@ export default function SettingsPage() {
     </main>
   );
 }
+
+    
