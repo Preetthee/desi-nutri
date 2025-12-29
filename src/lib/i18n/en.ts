@@ -21,13 +21,22 @@ export const en = {
   // Home Page
   'home.welcome': 'Welcome back, {name}!',
   'home.subtitle': 'Here is a snapshot of your daily health.',
-  'home.today_calories': "Today's Calorie Intake",
-  'home.today_calories.description': 'Total calories consumed today',
-  'home.daily_trend': 'Daily Trend',
-  'home.daily_trend.description': 'Compared to yesterday',
+  'home.today_calories': "Today's Calories",
+  'home.daily_trend.description': 'vs yesterday',
   'home.health_tip': 'Your Daily Health Tip',
   'home.health_tip.fallback.suggestion': 'Stay hydrated by drinking plenty of water.',
   'home.health_tip.fallback.explanation': 'Proper hydration is essential for overall health and can help with weight management.',
+  'home.goal.water': 'Goal: 2,500 ml',
+  'home.goal.steps': 'Goal: 8,000',
+  'home.goal.sleep': 'Goal: 7-8 hrs',
+  'home.quick_actions.title': 'Quick Actions',
+  'home.quick_actions.food_doctor': 'Ask Food Doctor',
+  'home.quick_actions.food_doctor.desc': 'Advice, safety checks',
+  'home.quick_actions.log_intake': 'Log Daily Intake',
+  'home.quick_actions.log_intake.desc': 'Add meals, water, activity',
+  'home.quick_actions.view_analytics': 'View Analytics',
+  'home.quick_actions.view_analytics.desc': 'Track your progress',
+
 
   // Onboarding Page
   'onboarding.welcome': 'Welcome to DeshiNutri',

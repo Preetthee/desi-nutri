@@ -3,7 +3,7 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { Home, BarChart, Settings, Dumbbell, HeartPulse, ListTodo } from 'lucide-react';
+import { Home, BarChart, Settings, Dumbbell, ShieldCheck, ListTodo } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   Sidebar,
@@ -28,7 +28,7 @@ export function AppSidebar() {
 
   const links = [
     { href: '/', label: t('sidebar.home'), icon: Home },
-    { href: '/food-doctor', label: t('sidebar.food_doctor'), icon: HeartPulse },
+    { href: '/food-doctor', label: t('sidebar.food_doctor'), icon: ShieldCheck },
     { href: '/daily-tracker', label: t('sidebar.daily_tracker'), icon: ListTodo },
     { href: '/analytics', label: t('sidebar.analytics'), icon: BarChart },
     { href: '/exercise', label: t('sidebar.exercise'), icon: Dumbbell },

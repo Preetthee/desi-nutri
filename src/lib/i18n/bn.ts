@@ -21,13 +21,22 @@ export const bn = {
   // Home Page
   'home.welcome': 'আবারও স্বাগতম, {name}!',
   'home.subtitle': 'এখানে আপনার দৈনিক স্বাস্থ্যের একটি চিত্র।',
-  'home.today_calories': 'আজকের ক্যালোরি গ্রহণ',
-  'home.today_calories.description': 'আজ মোট ক্যালোরি গ্রহণ করা হয়েছে',
-  'home.daily_trend': 'দৈনিক প্রবণতা',
+  'home.today_calories': 'আজকের ক্যালোরি',
   'home.daily_trend.description': 'গতকালের তুলনায়',
   'home.health_tip': 'আপনার দৈনিক স্বাস্থ্য টিপ',
   'home.health_tip.fallback.suggestion': 'প্রচুর পানি পান করে হাইড্রেটেড থাকুন।',
   'home.health_tip.fallback.explanation': 'সঠিক হাইড্রেশন সার্বিক স্বাস্থ্যের জন্য অপরিহার্য এবং ওজন নিয়ন্ত্রণে সহায়তা করতে পারে।',
+  'home.goal.water': 'লক্ষ্য: ২,৫০০ মিলি',
+  'home.goal.steps': 'লক্ষ্য: ৮,০০০',
+  'home.goal.sleep': 'লক্ষ্য: ৭-৮ ঘন্টা',
+  'home.quick_actions.title': 'দ্রুত পদক্ষেপ',
+  'home.quick_actions.food_doctor': 'ফুড ডক্টর জিজ্ঞাসা করুন',
+  'home.quick_actions.food_doctor.desc': 'খাবারের পরামর্শ ও নিরাপত্তা পরীক্ষা',
+  'home.quick_actions.log_intake': 'দৈনিক গ্রহণ লগ করুন',
+  'home.quick_actions.log_intake.desc': 'খাবার, জল, এবং কার্যকলাপ যোগ করুন',
+  'home.quick_actions.view_analytics': 'বিশ্লেষণ দেখুন',
+  'home.quick_actions.view_analytics.desc': 'আপনার অগ্রগতি ট্র্যাক করুন',
+
 
   // Onboarding Page
   'onboarding.welcome': 'দেশি নিউট্রিতে স্বাগতম',

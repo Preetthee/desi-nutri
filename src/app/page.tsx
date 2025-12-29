@@ -6,11 +6,13 @@ import { useRouter } from 'next/navigation';
 import type { LocalizedHealthTip, HealthTip, CalorieLog, HealthLog } from '@/lib/types';
 import { generateHealthTip } from '@/ai/flows/generate-health-tip';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { HeartPulse, TrendingUp, TrendingDown, ArrowRight, Lightbulb } from 'lucide-react';
+import { HeartPulse, TrendingUp, TrendingDown, ArrowRight, Lightbulb, Droplets, Footprints, BedDouble, ShieldCheck, ListTodo, BarChart } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { startOfToday, startOfYesterday, isSameDay, subDays } from 'date-fns';
+import { startOfToday, startOfYesterday, isSameDay, subDays, format } from 'date-fns';
 import { useTranslation } from '@/contexts/language-provider';
 import { useProfile } from '@/contexts/profile-provider';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 export default function Home() {
   const { activeProfile, updateActiveProfileData, isLoading: isProfileLoading } = useProfile();
@@ -29,7 +31,7 @@ export default function Home() {
     }
   }, [isClient, isProfileLoading, activeProfile, router]);
   
-  const recentHealthLog = useMemo(() => {
+  const recentHealthLogForTip = useMemo(() => {
     if (!isClient || !activeProfile || !activeProfile.healthLogs || activeProfile.healthLogs.length === 0) return null;
     const sortedLogs = [...activeProfile.healthLogs].sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     const today = startOfToday();
@@ -55,10 +57,10 @@ export default function Home() {
           const tip = await generateHealthTip({
             name: activeProfile.name,
             health_info: activeProfile.health_info,
-            recent_log: recentHealthLog ? {
-                water: recentHealthLog.water,
-                steps: recentHealthLog.steps,
-                sleepHours: recentHealthLog.sleepHours,
+            recent_log: recentHealthLogForTip ? {
+                water: recentHealthLogForTip.water,
+                steps: recentHealthLogForTip.steps,
+                sleepHours: recentHealthLogForTip.sleepHours,
             } : undefined
           });
           updateActiveProfileData({ healthTip: tip });
@@ -74,14 +76,16 @@ export default function Home() {
       setIsLoadingTip(false);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isClient, activeProfile, recentHealthLog]);
+  }, [isClient, activeProfile, recentHealthLogForTip]);
 
-  const { todayCalories, trendPercentage } = useMemo(() => {
-    if (!isClient || !activeProfile) return { todayCalories: 0, trendPercentage: 0 };
+  const { todayCalories, trendPercentage, todayHealthLog } = useMemo(() => {
+    if (!isClient || !activeProfile) return { todayCalories: 0, trendPercentage: 0, todayHealthLog: null };
     
     const logs: CalorieLog[] = activeProfile.calorieLogs || [];
+    const healthLogs: HealthLog[] = activeProfile.healthLogs || [];
     const today = startOfToday();
     const yesterday = startOfYesterday();
+    const todayKey = format(today, 'yyyy-MM-dd');
 
     const todayCalories = logs
       .filter(log => {
@@ -109,8 +113,10 @@ export default function Home() {
     } else if (todayCalories > 0) {
       trendPercentage = 100;
     }
+    
+    const todayHealthLog = healthLogs.find(log => log.date === todayKey) || null;
 
-    return { todayCalories, trendPercentage };
+    return { todayCalories, trendPercentage, todayHealthLog };
   }, [activeProfile, isClient]);
 
   const TrendIcon = trendPercentage > 0 ? TrendingUp : trendPercentage < 0 ? TrendingDown : ArrowRight;
@@ -142,7 +148,7 @@ export default function Home() {
         </p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{t('home.today_calories')}</CardTitle>
@@ -150,20 +156,43 @@ export default function Home() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{todayCalories.toLocaleString(numberLocale)}</div>
-            <p className="text-xs text-muted-foreground">{t('home.today_calories.description')}</p>
+             <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+              <TrendIcon className={`h-3 w-3 ${trendColor}`} />
+              <span className={trendColor}>
+                 {trendPercentage.toFixed(1)}%
+              </span>
+               {t('home.daily_trend.description')}
+            </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('home.daily_trend')}</CardTitle>
-            <TrendIcon className={`h-4 w-4 ${trendColor}`} />
+            <CardTitle className="text-sm font-medium">{t('daily_tracker.health_metrics.water')}</CardTitle>
+            <Droplets className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className={`text-2xl font-bold ${trendColor}`}>
-              {trendPercentage !== 0 && (trendPercentage > 0 ? '+' : '')}
-              {trendPercentage.toFixed(1)}%
-            </div>
-            <p className="text-xs text-muted-foreground">{t('home.daily_trend.description')}</p>
+            <div className="text-2xl font-bold">{(todayHealthLog?.water || 0).toLocaleString(numberLocale)} ml</div>
+            <p className="text-xs text-muted-foreground">{t('home.goal.water')}</p>
+          </CardContent>
+        </Card>
+         <Card>
+          <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">{t('daily_tracker.health_metrics.steps')}</CardTitle>
+            <Footprints className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{(todayHealthLog?.steps || 0).toLocaleString(numberLocale)}</div>
+            <p className="text-xs text-muted-foreground">{t('home.goal.steps')}</p>
+          </CardContent>
+        </Card>
+         <Card>
+          <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">{t('daily_tracker.health_metrics.sleep')}</CardTitle>
+            <BedDouble className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{(todayHealthLog?.sleepHours || 0).toLocaleString(numberLocale, {maximumFractionDigits: 1})} hrs</div>
+            <p className="text-xs text-muted-foreground">{t('home.goal.sleep')}</p>
           </CardContent>
         </Card>
       </div>
@@ -192,6 +221,41 @@ export default function Home() {
           )}
         </CardContent>
       </Card>
+      
+      <div className="mt-8">
+        <h2 className="text-lg font-semibold mb-4">{t('home.quick_actions.title')}</h2>
+        <div className="grid gap-4 md:grid-cols-3">
+            <Link href="/food-doctor" passHref>
+                <Button variant="outline" className="w-full h-16 justify-start text-left">
+                    <ShieldCheck className="mr-4 text-primary"/>
+                    <div>
+                        <p className="font-semibold">{t('home.quick_actions.food_doctor')}</p>
+                        <p className="text-xs text-muted-foreground">{t('home.quick_actions.food_doctor.desc')}</p>
+                    </div>
+                </Button>
+            </Link>
+            <Link href="/daily-tracker" passHref>
+                <Button variant="outline" className="w-full h-16 justify-start text-left">
+                    <ListTodo className="mr-4 text-primary"/>
+                    <div>
+                        <p className="font-semibold">{t('home.quick_actions.log_intake')}</p>
+                        <p className="text-xs text-muted-foreground">{t('home.quick_actions.log_intake.desc')}</p>
+                    </div>
+                </Button>
+            </Link>
+            <Link href="/analytics" passHref>
+                <Button variant="outline" className="w-full h-16 justify-start text-left">
+                    <BarChart className="mr-4 text-primary"/>
+                     <div>
+                        <p className="font-semibold">{t('home.quick_actions.view_analytics')}</p>
+                        <p className="text-xs text-muted-foreground">{t('home.quick_actions.view_analytics.desc')}</p>
+                    </div>
+                </Button>
+            </Link>
+        </div>
+      </div>
     </main>
   );
 }
+
+    
