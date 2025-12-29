@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview Checks if a specific food is appropriate for a user based on their profile.
@@ -16,7 +17,7 @@ const UserProfileSchema = z.object({
   age: z.number(),
   height: z.number(),
   weight: z.number(),
-  health_info: z.string(),
+  health_info: z.string().describe('Health goals, conditions, and any allergies. E.g., "lose weight, allergic to peanuts"'),
 });
 
 const CheckFoodAppropriatenessInputSchema = z.object({
@@ -27,8 +28,8 @@ export type CheckFoodAppropriatenessInput = z.infer<typeof CheckFoodAppropriaten
 
 const CheckFoodAppropriatenessOutputSchema = z.object({
   isAllowed: z.boolean().describe('Whether the user is allowed to eat the food.'),
-  recommendation: LocalizedTextSchema.describe('A detailed recommendation about the food, including portion size if allowed, in both Bengali and English.'),
-  reason: LocalizedTextSchema.describe('The reason for the recommendation, in both Bengali and English.'),
+  recommendation: LocalizedTextSchema.describe('A detailed recommendation. If allowed, suggest portion size. If not allowed due to allergy, suggest a safe alternative. Provide text in both Bengali and English.'),
+  reason: LocalizedTextSchema.describe('The reason for the recommendation. If unsafe, clearly state the allergy risk. Mention other side effects if relevant. Provide text in both Bengali and English.'),
 });
 export type CheckFoodAppropriatenessOutput = z.infer<typeof CheckFoodAppropriatenessOutputSchema>;
 
@@ -52,14 +53,28 @@ User Profile:
 - Age: {{profile.age}}
 - Height: {{profile.height}} cm
 - Weight: {{profile.weight}} kg
-- Health Info & Goals: "{{profile.health_info}}"
+- Health Info, Goals & Allergies: "{{profile.health_info}}"
 
 Food to check: "{{foodName}}"
 
-Based on the user's profile, determine if they should eat this food.
-- If it's allowed, set isAllowed to true.
-- If it's not allowed, set isAllowed to false.
-- Provide a recommendation (including portion size if allowed) and a reason for the decision in both English and Bengali.
+CRITICAL SAFETY INSTRUCTION:
+1.  Check if the user's health info contains any allergies that conflict with the requested food.
+2.  If the food contains an allergen mentioned by the user, you MUST set isAllowed to false. The reason MUST state the allergy risk. The recommendation MUST suggest a safe alternative.
+3.  If the food is safe from an allergy perspective, then evaluate it based on other health goals (e.g., weight loss, diabetes).
+4.  Mention potential side-effects (e.g., high sugar, high sodium) in the reason, even if the food is allowed.
+
+Example for a user with "allergic to nuts" asking about "Peanut Butter":
+{
+  "isAllowed": false,
+  "recommendation": {
+    "bn": "না, আপনার পিনাট বাটার খাওয়া উচিত নয়। এর পরিবর্তে আপনি সানফ্লাওয়ার সিড বাটার বা সয়াবিনের বাটার চেষ্টা করতে পারেন।",
+    "en": "No, you should not eat peanut butter. You can try sunflower seed butter or soy butter as an alternative."
+  },
+  "reason": {
+    "bn": "আপনার বাদামে অ্যালার্জি আছে এবং পিনাট বাটার বাদাম থেকে তৈরি, যা একটি গুরুতর অ্যালার্জিক প্রতিক্রিয়া সৃষ্টি করতে পারে।",
+    "en": "You have a nut allergy and peanut butter is made from peanuts, which can cause a severe allergic reaction."
+  }
+}
 
 Example for a diabetic user asking about "Mango":
 {
@@ -71,19 +86,6 @@ Example for a diabetic user asking about "Mango":
   "reason": {
     "bn": "আমে প্রাকৃতিক চিনি থাকে যা রক্তে শর্করার মাত্রা বাড়াতে পারে, তাই পরিমাণ সীমিত রাখা জরুরি।",
     "en": "Mango contains natural sugar that can raise blood sugar levels, so it's important to limit the amount."
-  }
-}
-
-Example for a user with gluten allergy asking about "Roti":
-{
-  "isAllowed": false,
-  "recommendation": {
-    "bn": "না, আপনার রুটি খাওয়া উচিত নয় কারণ এটি গমের তৈরি।",
-    "en": "No, you should not eat roti because it is made of wheat."
-  },
-  "reason": {
-    "bn": "আপনার গ্লুটেন অ্যালার্জি আছে এবং গমের রুটিতে গ্লুটেন থাকে, যা আপনার জন্য ক্ষতিকর হতে পারে।",
-    "en": "You have a gluten allergy, and wheat roti contains gluten, which can be harmful to you."
   }
 }
 `,
