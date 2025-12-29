@@ -63,7 +63,7 @@ export default function HealthTrackerPage() {
   const todayLog = useMemo(() => {
     if (!activeProfile || !date) return null;
     const dateKey = format(startOfDay(date), 'yyyy-MM-dd');
-    return activeProfile.healthLogs.find(log => log.date === dateKey);
+    return (activeProfile.healthLogs || []).find(log => log.date === dateKey);
   }, [activeProfile, date]);
 
   useEffect(() => {
