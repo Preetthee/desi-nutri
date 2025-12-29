@@ -1,3 +1,4 @@
+
 export const en = {
   // General
   'app.name': 'DeshiNutri',
@@ -14,6 +15,7 @@ export const en = {
   'sidebar.calorie_tracker': 'Calorie Tracker',
   'sidebar.analytics': 'Analytics',
   'sidebar.exercise': 'Exercise',
+  'sidebar.profiles': 'Profiles',
   'sidebar.settings': 'Settings',
 
   // Home Page
@@ -46,7 +48,18 @@ export const en = {
   'onboarding.health_info.placeholder': 'e.g., Want to lose weight, vegetarian.',
   'onboarding.health_info.description': 'This helps us give you better recommendations.',
   'onboarding.health_info.error': 'Please provide some health information.',
-  'onboarding.submit': 'Get Started',
+  'onboarding.submit': 'Create Profile',
+
+  // Profiles Page
+  'profiles.title': 'Manage Profiles',
+  'profiles.description': 'Select a profile or create a new one.',
+  'profiles.add_new': 'Add New Profile',
+  'profiles.switch_to': 'Switch to this Profile',
+  'profiles.active': 'Active',
+  'profiles.delete': 'Delete',
+  'profiles.delete.confirm.title': 'Delete Profile?',
+  'profiles.delete.confirm.description': 'This action cannot be undone. This will permanently delete all data for this profile.',
+
 
   // Food Doctor Page
   'food_doctor.title': 'Food Doctor',
@@ -120,14 +133,14 @@ export const en = {
   'settings.description': 'Manage your personal and health information.',
   'settings.profile.title': 'Edit Profile',
   'settings.profile.description': 'Update your details here.',
- 'settings.profile.success': 'Your profile has been updated successfully.',
+  'settings.profile.success': 'Your profile has been updated successfully.',
   'settings.profile.submit': 'Save Changes',
   'settings.danger_zone.title': 'Danger Zone',
   'settings.danger_zone.description': 'These actions cannot be undone. Please proceed with caution.',
-  'settings.danger_zone.clear_data': 'Clear All Data',
-  'settings.danger_zone.clear_data.success': 'All your data has been erased.',
+  'settings.danger_zone.delete_profile': 'Delete This Profile',
+  'settings.danger_zone.clear_data.success': 'Profile deleted successfully.',
   'settings.danger_zone.confirm.title': 'Are you sure?',
-  'settings.danger_zone.confirm.description': 'This action cannot be undone. This will permanently delete all your data and you will have to start from the onboarding page again.',
+  'settings.danger_zone.confirm.description_profile': 'This action cannot be undone. This will permanently delete this profile and all its data.',
   'settings.danger_zone.confirm.cancel': 'Cancel',
   'settings.danger_zone.confirm.continue': 'Continue',
 };

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect } from 'react';
@@ -40,6 +41,10 @@ export default function SettingsPage() {
   const [, setLogs] = useLocalStorage<CalorieLog[]>('calorieLogs', []);
   const [, setSuggestions] = useLocalStorage<FoodSuggestions | null>('foodSuggestions', null);
   const [, setHealthTip] = useLocalStorage<LocalizedHealthTip | null>('healthTip', null);
+  const [, setExerciseSuggestion] = useLocalStorage<any | null>('exerciseSuggestion', null);
+  const [, setExerciseChecklist] = useLocalStorage<string[]>('exerciseChecklist', []);
+  const [, setLastExerciseCheckDate] = useLocalStorage<string>('lastExerciseCheckDate', '');
+  
   const router = useRouter();
   const { toast } = useToast();
   const { t } = useTranslation();
@@ -80,6 +85,7 @@ export default function SettingsPage() {
         // Invalidate AI-generated content if profile changes
         setSuggestions(null);
         setHealthTip(null);
+        setExerciseSuggestion(null);
     }
 
     toast({
@@ -88,10 +94,26 @@ export default function SettingsPage() {
   }
 
   function handleClearData() {
+    // Clear all localStorage data
     setProfile(null);
     setLogs([]);
     setSuggestions(null);
     setHealthTip(null);
+    setExerciseSuggestion(null);
+    setExerciseChecklist([]);
+    setLastExerciseCheckDate('');
+
+    // Also remove the keys directly
+    if (typeof window !== 'undefined') {
+        localStorage.removeItem('userProfile');
+        localStorage.removeItem('calorieLogs');
+        localStorage.removeItem('foodSuggestions');
+        localStorage.removeItem('healthTip');
+        localStorage.removeItem('exerciseSuggestion');
+        localStorage.removeItem('exerciseChecklist');
+        localStorage.removeItem('lastExerciseCheckDate');
+    }
+
     toast({
         title: t('settings.danger_zone.clear_data.success'),
     });

@@ -1,7 +1,8 @@
+
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { useLocalStorage } from '@/hooks/use-local-storage';
+import { useProfile } from '@/contexts/profile-provider';
 import type { CalorieLog } from '@/lib/types';
 import { Pie, PieChart, Cell, Legend, Tooltip as RechartsTooltip } from 'recharts';
 import {
@@ -31,6 +32,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
 
 const chartConfig = {
   calories: {
@@ -57,14 +59,23 @@ const dayLabelsBn = {
 };
 
 export default function AnalyticsPage() {
-  const [logs] = useLocalStorage<CalorieLog[]>('calorieLogs', []);
+  const { activeProfile, isLoading: isProfileLoading } = useProfile();
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [isClient, setIsClient] = useState(false);
   const { t, locale } = useTranslation();
+  const router = useRouter();
 
   useEffect(() => setIsClient(true), []);
 
+  useEffect(() => {
+    if (isClient && !isProfileLoading && !activeProfile) {
+      router.replace('/onboarding');
+    }
+  }, [isClient, isProfileLoading, activeProfile, router]);
+
+
+  const logs = activeProfile?.calorieLogs || [];
   const dateLocale = locale === 'bn' ? bn : enUS;
   const numberLocale = locale === 'bn' ? 'bn-BD' : 'en-US';
 
@@ -160,6 +171,14 @@ export default function AnalyticsPage() {
     setCurrentMonth(prev => amount > 0 ? addMonths(prev, 1) : subMonths(prev, 1));
   };
   
+  if (isProfileLoading || (isClient && !activeProfile)) {
+     return (
+      <div className="flex h-screen w-full items-center justify-center bg-background">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      </div>
+    );
+  }
+
   return (
     <main className="flex-1 p-4 md:p-8">
       <div className="mb-8">
@@ -238,7 +257,7 @@ export default function AnalyticsPage() {
                             <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
                                 {selectedDayLog.map(log => (
                                     <div key={log.id} className="text-sm border-b pb-2">
-                                        <p className="font-semibold">{log.food_text}</p>
+                                        <p className="font-semibold">{log.items.map(i => i.name[locale]).join(', ')}</p>
                                         <p className="text-xs text-muted-foreground">{log.total_calories.toLocaleString(numberLocale)} {t('general.calories')}</p>
                                     </div>
                                 ))}

@@ -1,20 +1,19 @@
+
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { useLocalStorage } from '@/hooks/use-local-storage';
-import type { UserProfile, CalorieLog, LocalizedHealthTip, HealthTip } from '@/lib/types';
+import type { LocalizedHealthTip, HealthTip, CalorieLog } from '@/lib/types';
 import { generateHealthTip } from '@/ai/flows/generate-health-tip';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { HeartPulse, TrendingUp, TrendingDown, ArrowRight, Lightbulb } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { startOfToday, startOfYesterday, isSameDay } from 'date-fns';
 import { useTranslation } from '@/contexts/language-provider';
+import { useProfile } from '@/contexts/profile-provider';
 
 export default function Home() {
-  const [profile] = useLocalStorage<UserProfile | null>('userProfile', null);
-  const [logs] = useLocalStorage<CalorieLog[]>('calorieLogs', []);
-  const [healthTip, setHealthTip] = useLocalStorage<LocalizedHealthTip | null>('healthTip', null);
+  const { activeProfile, updateActiveProfileData, isLoading: isProfileLoading } = useProfile();
   const [isLoadingTip, setIsLoadingTip] = useState(true);
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
@@ -25,18 +24,18 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (isClient && !profile) {
+    if (isClient && !isProfileLoading && !activeProfile) {
       router.replace('/onboarding');
     }
-  }, [isClient, profile, router]);
+  }, [isClient, isProfileLoading, activeProfile, router]);
 
   useEffect(() => {
-    if (isClient && profile && !healthTip) {
+    if (isClient && activeProfile && !activeProfile.healthTip) {
       const fetchHealthTip = async () => {
         setIsLoadingTip(true);
         try {
-          const tip = await generateHealthTip({ name: profile.name, health_info: profile.health_info });
-          setHealthTip(tip);
+          const tip = await generateHealthTip({ name: activeProfile.name, health_info: activeProfile.health_info });
+          updateActiveProfileData({ healthTip: tip });
         } catch (error) {
           console.error("Failed to fetch health tip:", error);
           // Fallback is handled by checking healthTip value in render
@@ -45,15 +44,16 @@ export default function Home() {
         }
       };
       fetchHealthTip();
-    } else if (healthTip) {
+    } else if (activeProfile?.healthTip) {
       setIsLoadingTip(false);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isClient, profile]);
+  }, [isClient, activeProfile]);
 
   const { todayCalories, trendPercentage } = useMemo(() => {
-    if (!isClient) return { todayCalories: 0, trendPercentage: 0 };
+    if (!isClient || !activeProfile) return { todayCalories: 0, trendPercentage: 0 };
     
+    const logs: CalorieLog[] = activeProfile.calorieLogs || [];
     const today = startOfToday();
     const yesterday = startOfYesterday();
 
@@ -85,12 +85,12 @@ export default function Home() {
     }
 
     return { todayCalories, trendPercentage };
-  }, [logs, isClient]);
+  }, [activeProfile, isClient]);
 
   const TrendIcon = trendPercentage > 0 ? TrendingUp : trendPercentage < 0 ? TrendingDown : ArrowRight;
   const trendColor = trendPercentage > 0 ? 'text-red-500' : trendPercentage < 0 ? 'text-green-500' : 'text-muted-foreground';
 
-  if (!isClient || !profile) {
+  if (!isClient || isProfileLoading || !activeProfile) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-background">
         <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
@@ -100,7 +100,7 @@ export default function Home() {
 
   const numberLocale = locale === 'bn' ? 'bn-BD' : 'en-US';
 
-  const displayedHealthTip: HealthTip = healthTip ? healthTip[locale] : {
+  const displayedHealthTip: HealthTip = activeProfile.healthTip ? activeProfile.healthTip[locale] : {
       suggestion: t('home.health_tip.fallback.suggestion'),
       explanation: t('home.health_tip.fallback.explanation'),
   };
@@ -110,7 +110,7 @@ export default function Home() {
       <main className="flex-1 p-4 md:p-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold font-headline tracking-tight">
-            {t('home.welcome', { name: profile.name })}
+            {t('home.welcome', { name: activeProfile.name })}
           </h1>
           <p className="text-muted-foreground">
             {t('home.subtitle')}

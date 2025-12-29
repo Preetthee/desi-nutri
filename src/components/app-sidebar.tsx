@@ -1,8 +1,9 @@
+
 'use client';
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { Home, BarChart, Calculator, HeartPulse, Settings, Dumbbell } from 'lucide-react';
+import { Home, BarChart, Calculator, HeartPulse, Settings, Dumbbell, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   Sidebar,
@@ -31,6 +32,7 @@ export function AppSidebar() {
     { href: '/calorie-tracker', label: t('sidebar.calorie_tracker'), icon: Calculator },
     { href: '/analytics', label: t('sidebar.analytics'), icon: BarChart },
     { href: '/exercise', label: t('sidebar.exercise'), icon: Dumbbell },
+    { href: '/profiles', label: t('sidebar.profiles'), icon: Users },
     { href: '/settings', label: t('sidebar.settings'), icon: Settings },
   ];
 

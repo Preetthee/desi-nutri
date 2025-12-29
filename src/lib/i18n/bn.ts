@@ -1,3 +1,4 @@
+
 export const bn = {
   // General
   'app.name': 'দেশি নিউট্রি',
@@ -14,6 +15,7 @@ export const bn = {
   'sidebar.calorie_tracker': 'ক্যালোরি ট্র্যাকার',
   'sidebar.analytics': 'বিশ্লেষণ',
   'sidebar.exercise': 'ব্যায়াম',
+  'sidebar.profiles': 'প্রোফাইল',
   'sidebar.settings': 'সেটিংস',
 
   // Home Page
@@ -46,7 +48,18 @@ export const bn = {
   'onboarding.health_info.placeholder': 'উদাহরণ: ওজন কমাতে চাই, নিরামিষাশী।',
   'onboarding.health_info.description': 'এটি আমাদের আপনাকে আরও ভালো পরামর্শ দিতে সাহায্য করবে।',
   'onboarding.health_info.error': 'অনুগ্রহ করে কিছু স্বাস্থ্য সম্পর্কিত তথ্য দিন।',
-  'onboarding.submit': 'শুরু করুন',
+  'onboarding.submit': 'প্রোফাইল তৈরি করুন',
+
+  // Profiles Page
+  'profiles.title': 'প্রোফাইল পরিচালনা করুন',
+  'profiles.description': 'একটি প্রোফাইল নির্বাচন করুন বা একটি নতুন তৈরি করুন।',
+  'profiles.add_new': 'নতুন প্রোফাইল যোগ করুন',
+  'profiles.switch_to': 'এই প্রোফাইল ব্যবহার করুন',
+  'profiles.active': 'সক্রিয়',
+  'profiles.delete': 'মুছে ফেলুন',
+  'profiles.delete.confirm.title': 'প্রোফাইল মুছে ফেলতে চান?',
+  'profiles.delete.confirm.description': 'এই ক্রিয়াটি ফিরিয়ে আনা যাবে না। এটি স্থায়ীভাবে এই প্রোফাইলের সমস্ত ডেটা মুছে ফেলবে।',
+
 
   // Food Doctor Page
   'food_doctor.title': 'ফুড ডক্টর',
@@ -124,10 +137,10 @@ export const bn = {
   'settings.profile.submit': 'পরিবর্তনগুলি সংরক্ষণ করুন',
   'settings.danger_zone.title': 'বিপজ্জনক এলাকা',
   'settings.danger_zone.description': 'এই ক্রিয়াগুলি ফিরিয়ে আনা যাবে না। দয়া করে সাবধানে এগিয়ে যান।',
-  'settings.danger_zone.clear_data': 'সমস্ত ডেটা সাফ করুন',
-  'settings.danger_zone.clear_data.success': 'আপনার সমস্ত ডেটা মুছে ফেলা হয়েছে।',
+  'settings.danger_zone.delete_profile': 'এই প্রোফাইলটি মুছুন',
+  'settings.danger_zone.clear_data.success': 'প্রোফাইল সফলভাবে মুছে ফেলা হয়েছে।',
   'settings.danger_zone.confirm.title': 'আপনি কি নিশ্চিত?',
-  'settings.danger_zone.confirm.description': 'এই ক্রিয়াটি ফিরিয়ে আনা যাবে না। এটি আপনার সমস্ত ডেটা স্থায়ীভাবে মুছে ফেলবে এবং আপনাকে আবার অনবোর্ডিং পৃষ্ঠা থেকে শুরু করতে হবে।',
+  'settings.danger_zone.confirm.description_profile': 'এই ক্রিয়াটি ফিরিয়ে আনা যাবে না। এটি স্থায়ীভাবে এই প্রোফাইলের সমস্ত ডেটা মুছে ফেলবে।',
   'settings.danger_zone.confirm.cancel': 'বাতিল করুন',
   'settings.danger_zone.confirm.continue': 'চালিয়ে যান',
 };

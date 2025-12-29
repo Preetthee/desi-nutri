@@ -1,8 +1,8 @@
+
 'use client';
 
 import { useState, useTransition, useEffect, useMemo } from 'react';
-import { useLocalStorage } from '@/hooks/use-local-storage';
-import type { UserProfile, ExerciseSuggestion } from '@/lib/types';
+import type { ExerciseSuggestion } from '@/lib/types';
 import { generateExerciseSuggestion } from '@/ai/flows/generate-exercise-suggestion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -12,31 +12,45 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useTranslation } from '@/contexts/language-provider';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { useProfile } from '@/contexts/profile-provider';
+import { useRouter } from 'next/navigation';
 
 export default function ExercisePage() {
-  const [profile] = useLocalStorage<UserProfile | null>('userProfile', null);
-  const [suggestion, setSuggestion] = useLocalStorage<ExerciseSuggestion | null>('exerciseSuggestion', null);
+  const { activeProfile, updateActiveProfileData, isLoading: isProfileLoading } = useProfile();
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
   const { t, locale } = useTranslation();
-  const [checklist, setChecklist] = useLocalStorage<string[]>('exerciseChecklist', []);
-  const [lastCheckedDate, setLastCheckedDate] = useLocalStorage<string>('lastExerciseCheckDate', '');
+  const router = useRouter();
 
   useEffect(() => {
     setIsClient(true);
-    const today = new Date().toISOString().split('T')[0];
-    if (lastCheckedDate !== today) {
-      setChecklist([]);
-      setLastCheckedDate(today);
+  }, []);
+
+  useEffect(() => {
+    if (isClient && !isProfileLoading && !activeProfile) {
+      router.replace('/onboarding');
     }
-  }, [lastCheckedDate, setChecklist, setLastCheckedDate]);
+  }, [isClient, isProfileLoading, activeProfile, router]);
+
+
+  const checklist = activeProfile?.exerciseChecklist || [];
+  const lastCheckedDate = activeProfile?.lastExerciseCheckDate || '';
+
+  useEffect(() => {
+    if (activeProfile) {
+      const today = new Date().toISOString().split('T')[0];
+      if (lastCheckedDate !== today) {
+        updateActiveProfileData({ exerciseChecklist: [], lastExerciseCheckDate: today });
+      }
+    }
+  }, [lastCheckedDate, updateActiveProfileData, activeProfile]);
 
   const bmi = useMemo(() => {
-    if (!profile || !profile.height || !profile.weight) return null;
-    const heightInMeters = profile.height / 100;
-    return profile.weight / (heightInMeters * heightInMeters);
-  }, [profile]);
+    if (!activeProfile || !activeProfile.height || !activeProfile.weight) return null;
+    const heightInMeters = activeProfile.height / 100;
+    return activeProfile.weight / (heightInMeters * heightInMeters);
+  }, [activeProfile]);
 
   const bmiStatus = useMemo(() => {
     if (!bmi) return null;
@@ -52,7 +66,7 @@ export default function ExercisePage() {
   }, [bmi]);
   
   const handleGenerateSuggestion = () => {
-    if (!profile) {
+    if (!activeProfile) {
       toast({
         title: t('general.error'),
         description: t('food_doctor.check_food.no_profile'),
@@ -64,11 +78,10 @@ export default function ExercisePage() {
     startTransition(async () => {
       try {
         const result = await generateExerciseSuggestion({
-          profile: profile,
+          profile: activeProfile,
           needsToLoseWeight: needsToLoseWeight,
         });
-        setSuggestion(result);
-        setChecklist([]); // Reset checklist when new suggestion is generated
+        updateActiveProfileData({ exerciseSuggestion: result, exerciseChecklist: [] });
       } catch (error) {
         console.error(error);
         toast({
@@ -81,21 +94,33 @@ export default function ExercisePage() {
   };
 
   useEffect(() => {
-    if (isClient && !suggestion && profile) {
+    if (isClient && activeProfile && !activeProfile.exerciseSuggestion) {
       handleGenerateSuggestion();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profile, isClient]);
+  }, [activeProfile, isClient]);
 
   const handleCheckChange = (exerciseNameInEnglish: string, checked: boolean | string) => {
+    let newChecklist: string[];
     if(checked) {
-        setChecklist(prev => [...prev, exerciseNameInEnglish]);
+        newChecklist = [...checklist, exerciseNameInEnglish];
     } else {
-        setChecklist(prev => prev.filter(item => item !== exerciseNameInEnglish));
+        newChecklist = checklist.filter(item => item !== exerciseNameInEnglish);
     }
+    updateActiveProfileData({ exerciseChecklist: newChecklist });
   };
   
+  const suggestion = activeProfile?.exerciseSuggestion;
   const allTasksCompleted = suggestion && suggestion.exercises.every(ex => checklist.includes(ex.name.en));
+
+  if (isProfileLoading || (isClient && !activeProfile)) {
+     return (
+      <div className="flex h-screen w-full items-center justify-center bg-background">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      </div>
+    );
+  }
+
 
   return (
     <main className="flex-1 p-4 md:p-8">
@@ -104,7 +129,7 @@ export default function ExercisePage() {
           <h1 className="text-3xl font-bold font-headline tracking-tight">{t('exercise.title')}</h1>
           <p className="text-muted-foreground">{t('exercise.description')}</p>
         </div>
-         <Button onClick={() => { setSuggestion(null); handleGenerateSuggestion(); }} disabled={isPending}>
+         <Button onClick={() => { updateActiveProfileData({ exerciseSuggestion: null }); handleGenerateSuggestion(); }} disabled={isPending}>
           <RefreshCw className={`mr-2 h-4 w-4 ${isPending ? 'animate-spin' : ''}`} />
           {t('food_doctor.regenerate')}
         </Button>

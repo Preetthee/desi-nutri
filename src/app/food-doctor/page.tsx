@@ -1,10 +1,9 @@
+
 'use client';
 
 import { useState, useTransition, useEffect } from 'react';
-import { useLocalStorage } from '@/hooks/use-local-storage';
 import { generateFoodSuggestions } from '@/ai/flows/food-suggestions-from-profile';
 import { checkFoodAppropriateness, type CheckFoodAppropriatenessOutput } from '@/ai/flows/check-food-appropriateness';
-import type { FoodSuggestions, UserProfile } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -17,16 +16,18 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { useTranslation } from '@/contexts/language-provider';
+import { useProfile } from '@/contexts/profile-provider';
+import { useRouter } from 'next/navigation';
 
 export default function FoodDoctorPage() {
-  const [suggestions, setSuggestions] = useLocalStorage<FoodSuggestions | null>('foodSuggestions', null);
-  const [profile] = useLocalStorage<UserProfile | null>('userProfile', null);
+  const { activeProfile, updateActiveProfileData, isLoading: isProfileLoading } = useProfile();
   const [isGeneratingSuggestions, startGeneratingSuggestions] = useTransition();
   const [isCheckingFood, startCheckingFood] = useTransition();
   const [foodCheckResult, setFoodCheckResult] = useState<CheckFoodAppropriatenessOutput | null>(null);
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
   const { t, locale } = useTranslation();
+  const router = useRouter();
 
   const formSchema = z.object({
     foodName: z.string().min(2, t('food_doctor.check_food.placeholder')),
@@ -39,14 +40,17 @@ export default function FoodDoctorPage() {
 
   useEffect(() => {
     setIsClient(true);
-    if (isClient && !suggestions && profile) { // Only fetch if no suggestions and profile exists
-      handleGenerateSuggestions();
+  }, []);
+  
+  useEffect(() => {
+    if (isClient && !isProfileLoading && !activeProfile) {
+      router.replace('/onboarding');
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profile, isClient]); // Depend on profile
+  }, [isClient, isProfileLoading, activeProfile, router]);
+
 
   const handleGenerateSuggestions = () => {
-    if (!profile) {
+    if (!activeProfile) {
       toast({
         title: t('general.error'),
         description: t('food_doctor.check_food.no_profile'),
@@ -57,8 +61,8 @@ export default function FoodDoctorPage() {
 
     startGeneratingSuggestions(async () => {
       try {
-        const result = await generateFoodSuggestions(profile);
-        setSuggestions(result);
+        const result = await generateFoodSuggestions(activeProfile);
+        updateActiveProfileData({ foodSuggestions: result });
       } catch (error) {
         console.error(error);
         toast({
@@ -69,9 +73,16 @@ export default function FoodDoctorPage() {
       }
     });
   };
+  
+  useEffect(() => {
+    if (isClient && activeProfile && !activeProfile.foodSuggestions) {
+      handleGenerateSuggestions();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeProfile, isClient]);
 
   const onFoodCheckSubmit = (values: z.infer<typeof formSchema>) => {
-    if (!profile) {
+    if (!activeProfile) {
       toast({
         title: t('general.error'),
         description: t('food_doctor.check_food.no_profile'),
@@ -83,7 +94,7 @@ export default function FoodDoctorPage() {
     startCheckingFood(async () => {
       try {
         const result = await checkFoodAppropriateness({
-          profile,
+          profile: activeProfile,
           foodName: values.foodName,
         });
         setFoodCheckResult(result);
@@ -99,6 +110,15 @@ export default function FoodDoctorPage() {
   };
   
   const isPending = isGeneratingSuggestions;
+  const suggestions = activeProfile?.foodSuggestions;
+
+  if (isProfileLoading || (isClient && !activeProfile)) {
+     return (
+      <div className="flex h-screen w-full items-center justify-center bg-background">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      </div>
+    );
+  }
 
   const renderSkeleton = () => (
     <div className="space-y-8">
@@ -148,7 +168,7 @@ export default function FoodDoctorPage() {
           <h1 className="text-3xl font-bold font-headline tracking-tight">{t('food_doctor.title')}</h1>
           <p className="text-muted-foreground">{t('food_doctor.description')}</p>
         </div>
-        <Button onClick={() => { setSuggestions(null); handleGenerateSuggestions(); }} disabled={isPending}>
+        <Button onClick={() => { updateActiveProfileData({ foodSuggestions: null }); handleGenerateSuggestions(); }} disabled={isPending}>
           <RefreshCw className={`mr-2 h-4 w-4 ${isPending ? 'animate-spin' : ''}`} />
           {t('food_doctor.regenerate')}
         </Button>
@@ -289,5 +309,3 @@ export default function FoodDoctorPage() {
     </main>
   );
 }
-
-    

@@ -1,7 +1,7 @@
+
 'use client';
 
 import { useState, useTransition, useEffect } from 'react';
-import { useLocalStorage } from '@/hooks/use-local-storage';
 import { estimateCalories } from '@/ai/flows/estimate-calories-from-food-text';
 import type { CalorieLog } from '@/lib/types';
 import { useForm } from 'react-hook-form';
@@ -9,7 +9,6 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import { bn, enUS } from 'date-fns/locale';
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
@@ -19,17 +18,27 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@/component
 import { Bot } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useTranslation } from '@/contexts/language-provider';
+import { useProfile } from '@/contexts/profile-provider';
+import { useRouter } from 'next/navigation';
 
 export default function CalorieTrackerPage() {
-  const [logs, setLogs] = useLocalStorage<CalorieLog[]>('calorieLogs', []);
+  const { activeProfile, updateActiveProfileData, isLoading: isProfileLoading } = useProfile();
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
   const { t, locale } = useTranslation();
+  const router = useRouter();
 
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  useEffect(() => {
+    if (isClient && !isProfileLoading && !activeProfile) {
+      router.replace('/onboarding');
+    }
+  }, [isClient, isProfileLoading, activeProfile, router]);
+
 
   const formSchema = z.object({
     foodText: z.string().min(3, t('calorie_tracker.new_log.placeholder')),
@@ -41,6 +50,7 @@ export default function CalorieTrackerPage() {
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
+    if (!activeProfile) return;
     startTransition(async () => {
       try {
         const result = await estimateCalories({ food: values.foodText });
@@ -51,7 +61,7 @@ export default function CalorieTrackerPage() {
           total_calories: result.total_calories,
           date: new Date().toISOString(),
         };
-        setLogs((prevLogs) => [newLog, ...prevLogs]);
+        updateActiveProfileData({ calorieLogs: [newLog, ...(activeProfile.calorieLogs || [])] });
         form.reset();
       } catch (error) {
         console.error(error);
@@ -64,9 +74,18 @@ export default function CalorieTrackerPage() {
     });
   };
   
-  const sortedLogs = logs.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const logs = activeProfile?.calorieLogs || [];
+  const sortedLogs = [...logs].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   const dateLocale = locale === 'bn' ? bn : enUS;
   const numberLocale = locale === 'bn' ? 'bn-BD' : 'en-US';
+
+  if (isProfileLoading || (isClient && !activeProfile)) {
+     return (
+      <div className="flex h-screen w-full items-center justify-center bg-background">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      </div>
+    );
+  }
 
   return (
     <main className="flex-1 p-4 md:p-8">

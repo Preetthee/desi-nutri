@@ -1,11 +1,11 @@
+
 'use client';
 
-import { useLocalStorage } from '@/hooks/use-local-storage';
-import { useRouter } from 'next/navigation';
+import { useProfile } from '@/contexts/profile-provider';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import type { UserProfile } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -21,9 +21,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Logo } from '@/components/logo';
 import { useTranslation } from '@/contexts/language-provider';
+import { useEffect } from 'react';
 
 export default function OnboardingPage() {
-  const [, setProfile] = useLocalStorage<UserProfile | null>('userProfile', null);
+  const { addProfile, switchProfile } = useProfile();
   const router = useRouter();
   const { t } = useTranslation();
 
@@ -47,7 +48,8 @@ export default function OnboardingPage() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    setProfile(values);
+    const newProfile = addProfile(values);
+    switchProfile(newProfile.id);
     router.push('/');
   }
 

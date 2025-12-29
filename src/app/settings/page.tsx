@@ -1,12 +1,11 @@
+
 'use client';
 
 import { useEffect } from 'react';
-import { useLocalStorage } from '@/hooks/use-local-storage';
 import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import type { UserProfile, CalorieLog, FoodSuggestions } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -34,11 +33,10 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Trash2 } from 'lucide-react';
 import { useTranslation } from '@/contexts/language-provider';
+import { useProfile } from '@/contexts/profile-provider';
 
 export default function SettingsPage() {
-  const [profile, setProfile] = useLocalStorage<UserProfile | null>('userProfile', null);
-  const [, setLogs] = useLocalStorage<CalorieLog[]>('calorieLogs', []);
-  const [, setSuggestions] = useLocalStorage<FoodSuggestions | null>('foodSuggestions', null);
+  const { activeProfile, updateProfile, deleteProfile, isLoading } = useProfile();
   const router = useRouter();
   const { toast } = useToast();
   const { t } = useTranslation();
@@ -53,7 +51,7 @@ export default function SettingsPage() {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: profile || {
+    defaultValues: {
       name: '',
       age: 0,
       height: 0,
@@ -63,32 +61,36 @@ export default function SettingsPage() {
   });
   
   useEffect(() => {
-    if (!profile) {
+    if (!isLoading && !activeProfile) {
       router.replace('/onboarding');
-    } else {
-      form.reset(profile);
+    } else if (activeProfile) {
+      form.reset(activeProfile);
     }
-  }, [profile, form, router]);
+  }, [activeProfile, isLoading, form, router]);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    setProfile(values);
+    if (!activeProfile) return;
+    updateProfile({ ...values, id: activeProfile.id });
     toast({
         title: t('settings.profile.success'),
-    })
+    });
   }
 
-  function handleClearData() {
-    setProfile(null);
-    setLogs([]);
-    setSuggestions(null);
+  function handleDeleteProfile() {
+    if (!activeProfile) return;
+    deleteProfile(activeProfile.id);
     toast({
         title: t('settings.danger_zone.clear_data.success'),
+        variant: 'destructive',
     });
-    router.push('/onboarding');
   }
   
-  if (!profile) {
-    return null;
+  if (isLoading || !activeProfile) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-background">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      </div>
+    );
   }
 
   return (
@@ -197,19 +199,19 @@ export default function SettingsPage() {
                     <AlertDialogTrigger asChild>
                         <Button variant="destructive" className="w-full">
                             <Trash2 className="mr-2 h-4 w-4" />
-                            {t('settings.danger_zone.clear_data')}
+                            {t('settings.danger_zone.delete_profile')}
                         </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                         <AlertDialogHeader>
                         <AlertDialogTitle>{t('settings.danger_zone.confirm.title')}</AlertDialogTitle>
                         <AlertDialogDescription>
-                            {t('settings.danger_zone.confirm.description')}
+                            {t('settings.danger_zone.confirm.description_profile')}
                         </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                         <AlertDialogCancel>{t('settings.danger_zone.confirm.cancel')}</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleClearData}>{t('settings.danger_zone.confirm.continue')}</AlertDialogAction>
+                        <AlertDialogAction onClick={handleDeleteProfile}>{t('settings.danger_zone.confirm.continue')}</AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>

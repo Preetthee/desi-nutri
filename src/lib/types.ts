@@ -1,12 +1,5 @@
-import { z } from 'zod';
 
-export type UserProfile = {
-  name: string;
-  age: number;
-  height: number;
-  weight: number;
-  health_info: string;
-};
+import { z } from 'zod';
 
 export const LocalizedTextSchema = z.object({
   bn: z.string(),
@@ -58,4 +51,21 @@ export type HealthTip = {
 export type LocalizedHealthTip = {
   bn: HealthTip;
   en: HealthTip;
+};
+
+// New Profile-centric types
+export type UserProfile = {
+  id: string;
+  name: string;
+  age: number;
+  height: number;
+  weight: number;
+  health_info: string;
+  // Associated data
+  calorieLogs: CalorieLog[];
+  foodSuggestions: FoodSuggestions | null;
+  exerciseSuggestion: ExerciseSuggestion | null;
+  healthTip: LocalizedHealthTip | null;
+  exerciseChecklist: string[];
+  lastExerciseCheckDate: string;
 };
