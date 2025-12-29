@@ -3,12 +3,12 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import type { LocalizedHealthTip, HealthTip, CalorieLog } from '@/lib/types';
+import type { LocalizedHealthTip, HealthTip, CalorieLog, HealthLog } from '@/lib/types';
 import { generateHealthTip } from '@/ai/flows/generate-health-tip';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { HeartPulse, TrendingUp, TrendingDown, ArrowRight, Lightbulb } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { startOfToday, startOfYesterday, isSameDay } from 'date-fns';
+import { startOfToday, startOfYesterday, isSameDay, subDays } from 'date-fns';
 import { useTranslation } from '@/contexts/language-provider';
 import { useProfile } from '@/contexts/profile-provider';
 
@@ -28,13 +28,39 @@ export default function Home() {
       router.replace('/onboarding');
     }
   }, [isClient, isProfileLoading, activeProfile, router]);
+  
+  const recentHealthLog = useMemo(() => {
+    if (!isClient || !activeProfile || !activeProfile.healthLogs || activeProfile.healthLogs.length === 0) return null;
+    const sortedLogs = [...activeProfile.healthLogs].sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    const today = startOfToday();
+    const yesterday = startOfYesterday();
+    
+    // Find log for today or yesterday
+    return sortedLogs.find(log => {
+      try {
+        const logDate = new Date(log.date);
+        return isSameDay(logDate, today) || isSameDay(logDate, yesterday);
+      } catch(e) {
+        return false;
+      }
+    }) || null;
+  }, [isClient, activeProfile]);
+
 
   useEffect(() => {
     if (isClient && activeProfile && !activeProfile.healthTip) {
       const fetchHealthTip = async () => {
         setIsLoadingTip(true);
         try {
-          const tip = await generateHealthTip({ name: activeProfile.name, health_info: activeProfile.health_info });
+          const tip = await generateHealthTip({
+            name: activeProfile.name,
+            health_info: activeProfile.health_info,
+            recent_log: recentHealthLog ? {
+                water: recentHealthLog.water,
+                steps: recentHealthLog.steps,
+                sleepHours: recentHealthLog.sleepHours,
+            } : undefined
+          });
           updateActiveProfileData({ healthTip: tip });
         } catch (error) {
           console.error("Failed to fetch health tip:", error);
@@ -48,7 +74,7 @@ export default function Home() {
       setIsLoadingTip(false);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isClient, activeProfile]);
+  }, [isClient, activeProfile, recentHealthLog]);
 
   const { todayCalories, trendPercentage } = useMemo(() => {
     if (!isClient || !activeProfile) return { todayCalories: 0, trendPercentage: 0 };
@@ -149,6 +175,9 @@ export default function Home() {
               <Lightbulb className="text-primary" />
               {t('home.health_tip')}
             </CardTitle>
+             {activeProfile.healthTip?.[locale]?.context && (
+                <p className="text-xs text-muted-foreground pt-1">{activeProfile.healthTip[locale].context}</p>
+              )}
           </CardHeader>
           <CardContent>
             {isLoadingTip ? (

@@ -46,6 +46,7 @@ export type ExerciseSuggestion = {
 export type HealthTip = {
   suggestion: string;
   explanation: string;
+  context?: string;
 };
 
 export type LocalizedHealthTip = {
