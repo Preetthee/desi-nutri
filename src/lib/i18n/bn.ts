@@ -136,7 +136,7 @@ export const bn = {
 
   // Exercise Page
   'exercise.title': 'ব্যায়াম গাইড',
-  'exercise.description': 'আপনার ব্যক্তিগত AI-চালিত ব্যায়am প্রশিক্ষক।',
+  'exercise.description': 'আপনার ব্যক্তিগত AI-চালিত ব্যায়াম প্রশিক্ষক।',
   'exercise.bmi_status.title': 'আপনার বর্তমান অবস্থা',
   'exercise.bmi_status.description': 'আপনার BMI হলো {bmi}, যা {status} হিসাবে বিবেচিত।',
   'exercise.bmi_status.underweight': 'কম ওজন',
@@ -168,5 +168,3 @@ export const bn = {
   'settings.danger_zone.confirm.cancel': 'বাতিল করুন',
   'settings.danger_zone.confirm.continue': 'চালিয়ে যান',
 };
-
-    

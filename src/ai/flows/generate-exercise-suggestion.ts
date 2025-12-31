@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview Generates a personalized exercise suggestion based on user profile.
